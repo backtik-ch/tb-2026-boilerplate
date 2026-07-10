@@ -1,0 +1,55 @@
+{
+  "project": {
+    "name": "boilerplate",
+    "repositoryUrl": "https://github.com/floriansalvi/TB_Boilerplate.git"
+  },
+  "technologies": {
+    "backend": [],
+    "frontend": [],
+    "database": [],
+    "infrastructure": [],
+    "testing": []
+  },
+  "structure": {
+    "tree": [
+      "├── package.json"
+    ]
+  },
+  "dependencies": {
+    "composer": {},
+    "composerDev": {},
+    "npm": {},
+    "npmDev": {}
+  },
+  "scripts": {
+    "composer": {},
+    "npm": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "analyze": "node scripts/readme-generator/analyze-project.mjs"
+    }
+  },
+  "environment": {
+    "variablesCount": 0,
+    "importantVariables": []
+  },
+  "docker": {
+    "enabled": false,
+    "files": []
+  },
+  "routes": {
+    "web": [],
+    "api": []
+  },
+  "databaseFiles": {
+    "migrationsCount": 0,
+    "seedersCount": 0,
+    "factoriesCount": 0
+  },
+  "sourceFiles": {
+    "packageJson": true,
+    "composerJson": false,
+    "envExample": false,
+    "dockerCompose": false,
+    "dockerComposeOverride": false
+  }
+}
