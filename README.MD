@@ -8,11 +8,11 @@
 
 | Domaine | Technologies |
 |---------|--------------|
-| Backend | Non applicable (aucune dépendance backend détectée) |
-| Frontend | Node.js (npm), Vite |
-| Base de données | Non applicable (aucune base de données détectée) |
+| Backend | N/A |
+| Frontend | Node.js (npm), Vite (scripts `vite` / `vite build`) |
+| Base de données | N/A |
 | Infrastructure | GitHub Actions (workflows) |
-| Tests | Non déterminé (aucun framework de test détecté) | 
+| Tests | N/A | 
 
 ---
 
@@ -27,8 +27,7 @@ L’organisation du projet est la suivante.
 │   └── readme-generator/
 ├── .gitignore
 ├── package-lock.json
-├── package.json
-└── README.MD
+└── package.json
 ```
 
 ---
@@ -64,7 +63,7 @@ cp .env.example .env
 #### Backend
 
 ```bash
-# Non applicable
+# N/A
 ```
 
 #### Frontend
@@ -93,30 +92,30 @@ Les variables d’environnement suivantes doivent être adaptées.
 
 | Variable | Description |
 |-----------|-------------|
-| Aucune | Aucune variable d’environnement requise détectée. |
+| N/A | Aucune variable d’environnement requise n’a été détectée dans le contexte. |
 
 ---
 
 ## Base de données
 
-Aucune base de données n’a été détectée dans le projet.
+Aucune base de données n’est configurée/détectée dans le contexte du projet.
 
 ### 1. Initialisation
 
 ```bash
-# Non applicable
+# N/A
 ```
 
 ### 2. Migrations
 
 ```bash
-# Non applicable
+# N/A
 ```
 
 ### 3. Seeders
 
 ```bash
-# Non applicable
+# N/A
 ```
 
 ---
@@ -126,13 +125,13 @@ Aucune base de données n’a été détectée dans le projet.
 ### 1. Configuration
 
 ```bash
-# Non déterminé (aucun outil de test détecté)
+# N/A
 ```
 
 ### 2. Exécution
 
 ```bash
-# Non déterminé (aucun script de test détecté)
+# N/A
 ```
 
 ---
@@ -141,11 +140,11 @@ Aucune base de données n’a été détectée dans le projet.
 
 | Commande | Description |
 |----------|-------------|
-| `npm run dev` | Démarre le serveur de développement Vite |
-| `npm run build` | Construit le projet (build Vite) |
-| `npm run analyze` | Analyse le projet (script interne) |
-| `npm run generate:readme` | Génère le README (script interne) |
-| `npm run docs:readme` | Enchaîne l’analyse puis la génération du README |
+| `npm run dev` | Démarre le serveur de développement (Vite). |
+| `npm run build` | Construit le projet pour la production (Vite). |
+| `npm run analyze` | Analyse le projet (script `scripts/readme-generator/analyze-project.mjs`). |
+| `npm run generate:readme` | Génère le README (script `scripts/readme-generator/generate-readme.mjs`). |
+| `npm run docs:readme` | Exécute l’analyse puis la génération du README. |
 
 ---
 

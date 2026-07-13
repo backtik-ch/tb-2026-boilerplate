@@ -15,8 +15,7 @@
       "│   └── readme-generator/",
       "├── .gitignore",
       "├── package-lock.json",
-      "├── package.json",
-      "└── README.MD"
+      "└── package.json"
     ]
   },
   "dependencies": {

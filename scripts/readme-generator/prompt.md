@@ -56,7 +56,7 @@ Ignore cette section qui doit être remplie manuellement.
 - Affiche les dossiers de la racine principaux.
 - Développe uniquement les dossiers particulièrement structurant.
 - Ne détaille pas les répertoires de configuration qui contiennent de nombreux fichiers similaires.
-- Ne détaille pas les fichiers internes (config/ ; lang/ ; tests/ ; .github/ ; etc.), sauf si nécessaire. 
+- Ne détaille pas les fichiers internes (config/ ; lang/ ; tests/ ; .github/ ; .gitignore ; etc.), sauf si nécessaire. 
 - Limite l'arborescence finale à environ 15 à 25 lignes.
 - Conserve une représentation en arbre en utilisant '├──', '└──' et '│'.
 - Ne commente pas le contenu des répertoires.
