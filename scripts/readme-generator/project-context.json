@@ -4,28 +4,37 @@
     "repositoryUrl": "https://github.com/floriansalvi/TB_Boilerplate.git"
   },
   "technologies": {
-    "backend": [],
-    "frontend": [],
     "database": [],
-    "infrastructure": [],
-    "testing": []
+    "infrastructure": []
   },
   "structure": {
     "tree": [
-      "├── package.json"
+      "├── .github/",
+      "│   └── workflows/",
+      "├── scripts/",
+      "│   └── readme-generator/",
+      "├── .gitignore",
+      "├── package-lock.json",
+      "├── package.json",
+      "└── README.MD"
     ]
   },
   "dependencies": {
     "composer": {},
     "composerDev": {},
-    "npm": {},
+    "npm": {
+      "openai": "^6.46.0"
+    },
     "npmDev": {}
   },
   "scripts": {
     "composer": {},
     "npm": {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "analyze": "node scripts/readme-generator/analyze-project.mjs"
+      "dev": "vite",
+      "build": "vite build",
+      "analyze": "node scripts/readme-generator/analyze-project.mjs",
+      "generate:readme": "node --env-file=.env scripts/readme-generator/generate-readme.mjs",
+      "docs:readme": "npm run analyze && npm run generate:readme"
     }
   },
   "environment": {

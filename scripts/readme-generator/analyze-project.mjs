@@ -1,3 +1,7 @@
+/**
+ * Ce script analyse le projet (structure, techologies, dépendances, variables d'environnement, etc.) et génère un fichier JSON de contexte du projet.
+ */
+
 // Importer le module 'fs' pour la manipulation des fichiers
 import fs from "fs";
 // Importer le module 'path' pour la manipulation des chemins de fichiers
@@ -50,33 +54,71 @@ function getGitRepoUrl() {
 }
 
 // Générer un arbre du projet en se basant sur les chemins importants
-function getProjectTree(directoryPath = root, depth = 0, maxDepth = 2, lines = []) {
-    const importantPaths = [
-        'app',
-        'config',
-        'database',
-        'resources',
-        'routes',
-        'tests',
-        'docker',
-        'Dockerfile',
-        'docker-compose.yml',
-        'docker-compose.override.yml',
-        'composer.json',
-        'package.json',
-        'vite.config.js',
-        'playwright.config.js',
-        'phpunit.xml',
-    ]
+function getProjectTree(directoryPath = root, currentDepth = 0, maxDepth = 1, prefix = "") {
+    if (currentDepth > maxDepth) return [];
 
-    return importantPaths
-        .filter((item) => fileExists(path.join(root, item)))
-        .map((item) => {
-            const itemPath = path.join(root, item);
-            const isDirectory = fs.statSync(itemPath).isDirectory();
+    const ignoredDirs = new Set([
+        "node_modules",
+        "vendor",
+        ".git",
+        "storage",
+        "public",
+        "dist",
+        "build",
+        ".DS_Store",
+        ".vscode",
+        ".gemini",
+        ".claude",
+        ".playwright",
+        ".playwright-mcp",
+        ".playwright-report",
+        ".env"
+    ]);
 
-            return `├── ${item}${isDirectory ? '/' : ''}`;
-        })
+    const items = fs.readdirSync(directoryPath, { withFileTypes: true });
+    
+    const importantItems = items.filter((item) => {
+        const itemPath = path
+            .relative(root, path.join(directoryPath, item.name))
+            .replaceAll("\\", "/");
+
+        return (
+            !ignoredDirs.has(item.name) &&
+            !ignoredDirs.has(itemPath)
+        );
+    })
+    .sort((a, b) => {
+        if (a.isDirectory() && !b.isDirectory()) return -1;
+        if (!a.isDirectory() && b.isDirectory()) return 1;
+        return a.name.localeCompare(b.name);
+    });
+
+    const lines = [];
+
+    importantItems.forEach((item, index) => {
+        const isLast = index === importantItems.length - 1;
+        const branch = isLast ? "└── " : "├── ";
+        const itemPath = path.join(directoryPath, item.name);
+
+        lines.push(
+            `${prefix}${branch}${item.name}${item.isDirectory() ? "/" : ""}`
+        );
+
+        if (item.isDirectory() && currentDepth < maxDepth) {
+            const newPrefix = `${prefix}${isLast ? "    " : "│   "}`;
+
+            lines.push(
+                ...getProjectTree(
+                    itemPath,
+                    currentDepth + 1,
+                    maxDepth,
+                    newPrefix
+                )
+            )
+        };
+    })
+
+    return lines;
 }
 
 // Obtenir les variables d'environnement du fichier .env ou .env.example
@@ -109,47 +151,6 @@ function getImportantEnvVariables(envVariables) {
     );
 }
 
-// Obtenir les technologies backend à partir du fichier composer.json
-function getBackendTechnologies(composerJson) {
-    if (!composerJson) return [];
-
-    const dependencies = {
-        ...composerJson.require,
-        ...composerJson["require-dev"]
-    };
-
-    const technologies = [];
-
-    if (dependencies["laravel/framework"]) technologies.push(`Laravel ${dependencies["laravel/framework"]}`);
-    if (dependencies["php"]) technologies.push(`PHP ${dependencies["php"]}`);
-    if (dependencies["pestphp/pest"]) technologies.push(`Pest ${dependencies["pestphp/pest"]}`);
-    if (dependencies["phpunit/phpunit"]) technologies.push(`PHPUnit ${dependencies["phpunit/phpunit"]}`);
-
-    return technologies;
-}
-
-// Obtenir les technologies frontend à partir du fichier package.json
-function getFrontendTechnologies(packageJson) {
-    if (!packageJson) return [];
-
-    const dependencies = {
-        ...packageJson.dependencies,
-        ...packageJson.devDependencies
-    };
-
-    const technologies = [];
-
-    if (dependencies["vue"]) technologies.push(`Vue ${dependencies["vue"]}`);
-    if (dependencies["next"]) technologies.push(`Next.js ${dependencies["next"]}`);
-    if (dependencies["nuxt"]) technologies.push(`Nuxt.js ${dependencies["nuxt"]}`);
-    if (dependencies["vite"]) technologies.push(`Vite ${dependencies["vite"]}`);
-    if (dependencies["tailwindcss"]) technologies.push("Tailwind CSS");
-    if (dependencies["@playwright/test"]) technologies.push("Playwright");
-    if (dependencies["vitest"]) technologies.push("Vitest");
-
-    return technologies;
-}
-
 // Obtenir les technologies de base de données à partir du contenu des fichiers .env et docker-compose
 function getDatabaseTechnologies(envContent, dockerComposeContent) {
     const technologies = [];
@@ -167,11 +168,21 @@ function getDatabaseTechnologies(envContent, dockerComposeContent) {
 // Obtenir un résumé des routes à partir du contenu des fichiers de routes
 function getRouteSummary(routerContent) {
     if (!routerContent) return [];
-    return routerContent
+
+    const maxLength = 10;
+    
+    const routes = routerContent
         .split("\n")
         .map((line) => line.trim())
         .filter((line) => line.startsWith("Route::"))
-        .slice(0, 50);
+
+    const summary = routes.slice(0, maxLength);
+
+    if (routes.length > maxLength) {
+        summary.push("…");
+    }
+
+    return summary;
 }
 
 // Lire les fichiers de configuration du projet
@@ -199,18 +210,13 @@ const context = {
     },
 
     technologies: {
-        backend: getBackendTechnologies(composerJson),
-        frontend: getFrontendTechnologies(packageJson),
-        database: getDatabaseTechnologies(envExample, `${dockerCompose ?? ""}\n${dockerComposeOverride ?? ""}`),
+        database: getDatabaseTechnologies(
+            envExample,
+            `${dockerCompose ?? ""}\n${dockerComposeOverride ?? ""}`
+        ),
         infrastructure: [
             fileExists(path.join(root, "Dockerfile")) ? "Docker" : null,
             dockerCompose ? "Docker Compose" : null,
-        ].filter(Boolean),
-        testing: [
-            packageJson?.devDependencies?.["@playwright/test"] ? "Playwright" : null,
-            packageJson?.devDependencies?.["vitest"] ? "Vitest" : null,
-            composerJson?.["require-dev"]?.["pestphp/pest"] ? "Pest" : null,
-            composerJson?.["require-dev"]?.["phpunit/phpunit"] ? "PHPUnit" : null,
         ].filter(Boolean),
     },  
     
