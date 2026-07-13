@@ -41,31 +41,31 @@ jobs:
         run: npm run docs:readme
 
       - name: Check README changes
-        id: readme-changes
+        id: readme_changes
         shell: bash
         run: |
-          if git diff --quiet -- README.md; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "Aucune modification du README"
-          else
+          if [ -n "$(git status --porcelain -- README.md)" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Le README a été modifié."
-            git diff -- README.md
+            echo "Le README a été créé ou modifié."
+            git status --short -- README.md
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Aucune modification du README."
           fi
 
       - name: Configure Git
-        if: steps.readme-changes.outputs.changed == 'true'
+        if: steps.readme_changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       
       - name: Commit README
-        if: steps.readme-changes.outputs.changed == 'true'
+        if: steps.readme_changes.outputs.changed == 'true'
         run: |
           git add README.md
           git commit -m "fix(docs): update/generate README"
 
       - name: Push README
-        if: steps.readme-changes.outputs.changed == 'true'
+        if: steps.readme_changes.outputs.changed == 'true'
         run: |
           git push
