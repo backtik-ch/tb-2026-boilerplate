@@ -1,0 +1,71 @@
+name: Generate README
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  generate-readme:
+    name: Generate README
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Analyze project and generate README
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+        run: npm run docs:readme
+
+      - name: Check README changes
+        id: readme-changes
+        shell: bash
+        run: |
+          if git diff --quiet -- README.md; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Aucune modification du README"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Le README a été modifié."
+            git diff -- README.md
+          fi
+
+      - name: Configure Git
+        if: steps.readme-changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      
+      - name: Commit README
+        if: steps.readme-changes.outputs.changed == 'true'
+        run: |
+          git add README.md
+          git commit -m "fix(docs): update/generate README"
+
+      - name: Push README
+        if: steps.readme-changes.outputs.changed == 'true'
+        run: |
+          git push
