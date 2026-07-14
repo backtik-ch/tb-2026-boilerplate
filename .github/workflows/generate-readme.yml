@@ -72,6 +72,11 @@ jobs:
         if: steps.files_changes.outputs.changed == 'true'
         run: npm ci
 
+      # Créer un fichier .env en copiant .env.example
+      - name: Create .env
+        if: steps.files_changes.outputs.changed == 'true'
+        run: cp .env.example .env
+
       # Exécute les scripts d'analyse du projet et de génération du README par LLM.
       - name: Analyze project and generate README
         if: steps.files_changes.outputs.changed == 'true'
