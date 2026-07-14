@@ -13,12 +13,13 @@ jobs:
   generate-readme:
     name: Generate README
     runs-on: ubuntu-latest
-
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    
     permissions:
       contents: write
 
     steps:
-      # Réccupère uniquement le contenu de la branche sur laquelle est exécutée la Pull Request.
+      # Récupère uniquement le contenu de la branche sur laquelle est exécutée la Pull Request.
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -26,8 +27,41 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
           fetch-depth: 0
 
-      # Installe Node.js et intie le cache npm.
+      # Vérifie si un fichier lié au README et sa génération a été modifié dans le dernier commit.
+      - name: Check files changes
+        id: files_changes
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Exécution manuelle : la génération du README est lancée."
+            exit 0
+          fi
+          git fetch origin "${{ github.base_ref }}"
+          changed_files="$(git diff \
+            --name-only \
+            "origin/${{ github.base_ref }}...HEAD" \
+            -- \
+            README.md \
+            package.json \
+            composer.json \
+            docker-compose.yml \
+            scripts/readme-generator/prompt.md \
+            scripts/readme-generator/README-template.md \
+            scripts/readme-generator/analyze-project.mjs \
+            scripts/readme-generator/generate-readme.mjs
+          )"
+          if [ -n "$changed_files" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Un ou plusieurs fichiers surveillés ont été modifiés"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Aucun fichier surveillé n'a été modifié."
+          fi
+
+      # Installe Node.js et initie le cache npm.
       - name: Setup Node.js
+        if: steps.files_changes.outputs.changed == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -35,10 +69,12 @@ jobs:
       
       # Installe les dépendances du projet mentionnées dans les fichiers de configuration.
       - name: Install dependencies
+        if: steps.files_changes.outputs.changed == 'true'
         run: npm ci
 
       # Exécute les scripts d'analyse du projet et de génération du README par LLM.
       - name: Analyze project and generate README
+        if: steps.files_changes.outputs.changed == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
@@ -47,6 +83,7 @@ jobs:
       # Vérifie que le README ait été modifié ou créé pour éviter un commit inutile.
       - name: Check README changes
         id: readme_changes
+        if: steps.files_changes.outputs.changed == 'true'
         shell: bash
         run: |
           if [ -n "$(git status --porcelain -- README.md)" ]; then
