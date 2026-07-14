@@ -18,6 +18,7 @@ jobs:
       contents: write
 
     steps:
+      # Réccupère uniquement le contenu de la branche sur laquelle est exécutée la Pull Request.
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -25,21 +26,25 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
           fetch-depth: 0
 
+      # Installe Node.js et intie le cache npm.
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
       
+      # Installe les dépendances du projet mentionnées dans les fichiers de configuration.
       - name: Install dependencies
         run: npm ci
 
+      # Exécute les scripts d'analyse du projet et de génération du README par LLM.
       - name: Analyze project and generate README
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
         run: npm run docs:readme
 
+      # Vérifie que le README ait été modifié ou créé pour éviter un commit inutile.
       - name: Check README changes
         id: readme_changes
         shell: bash
@@ -53,18 +58,21 @@ jobs:
             echo "Aucune modification du README."
           fi
 
+      # Configure l'utilisateur Git pour le commit automatique.
       - name: Configure Git
         if: steps.readme_changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       
+      # Créer un commit uniquement pour le README.md.
       - name: Commit README
         if: steps.readme_changes.outputs.changed == 'true'
         run: |
           git add README.md
           git commit -m "fix(docs): update/generate README"
 
+      # Push le commit sur la branche concernée par la Pull Request.
       - name: Push README
         if: steps.readme_changes.outputs.changed == 'true'
         run: |

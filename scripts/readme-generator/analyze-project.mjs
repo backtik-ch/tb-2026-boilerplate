@@ -1,30 +1,39 @@
-/**
- * Ce script analyse le projet (structure, techologies, dépendances, variables d'environnement, etc.) et génère un fichier JSON de contexte du projet.
- */
-
-// Importer le module 'fs' pour la manipulation des fichiers
 import fs from "fs";
-// Importer le module 'path' pour la manipulation des chemins de fichiers
 import path from "path";
-// Importer le module 'child_process' pour exécuter des commandes shell
 import { execSync } from "child_process";
 
-// Définir le chemin racine du projet
+// Racine du projet
 const root = path.resolve(process.cwd());
-// Définir le chemin de sortie pour le fichier JSON de contexte du projet
+
+// Chemin de sortie du fichier de contexte généré.
 const outputPath = path.join(root, "scripts/readme-generator/project-context.json");
 
-// Vérifier si un fichier existe à un chemin donné
+/**
+ * Vérifie si un fichier ou un répertoire existe.
+ * 
+ * @param {string} filePath Chemin du fichier à vérifier.
+ * @returns {boolean} true si le fichier existe, sinon false.
+ */
 function fileExists(filePath) {
     return fs.existsSync(filePath);
 }
 
-// Lire le contenu d'un fichier s'il existe, sinon retourner null
+/**
+ * Lit le contenu d'un fichier s'il existe.
+ * 
+ * @param {string} filePath Chemin du fichier à vérifier.
+ * @returns {string|null} Contenu du fichier s'il existe, sinon null.
+ */
 function readFileIfExists(filePath) {
     return fileExists(filePath) ? fs.readFileSync(filePath, "utf-8") : null;
 }
 
-// Lire et analyser un fichier JSON s'il existe, sinon retourner null
+/**
+ * Lit le contenu d'un fichier et vérifie qu'il s'agisse de JSON.
+ * 
+ * @param {string} filePath Chemin du fichier à lire.
+ * @returns {Object|null} Objet JSON si le fichier existe et est valide, sinon null.
+ */
 function readJsonFileIfExists(filePath) {
     const content = readFileIfExists(filePath);
     if(content === null) return null;
@@ -35,13 +44,22 @@ function readJsonFileIfExists(filePath) {
     }
 }
 
-// Lister les fichiers dans un répertoire donné et en retourner des chemins relatifs
+/**
+ * Liste les fichiers présents dans un répertoire.
+ * 
+ * @param {string} directoryPath Chemin du répertoire à lire.
+ * @returns {string[]} Liste des chemins des fichiers présents dans le répertoire.
+ */
 function listFilesInDirectory(directoryPath) {
     if (!fileExists(directoryPath)) return [];
     return fs.readdirSync(directoryPath).map(file => path.relative(root, path.join(directoryPath, file)));
 }
 
-// Obtenir l'URL du dépôt Git
+/**
+ * Retourne l'URL du dépôt distant Git.
+ * 
+ * @returns {string|null} L'URL du dépôt distant si trouvable, sinon null.
+ */
 function getGitRepoUrl() {
     try {
         return execSync("git config --get remote.origin.url", {
@@ -53,7 +71,15 @@ function getGitRepoUrl() {
     }
 }
 
-// Générer un arbre du projet en se basant sur les chemins importants
+/**
+ * Génère une représentation en arbre (texte) de l'arborescence du projet.
+ * 
+ * @param {string} directoryPath Chemin du répertoire à parcourir.
+ * @param {number} currentDepth Niveau actuel de la récursion.
+ * @param {number} maxDepth Niveau maximum de la récursion.
+ * @param {string} prefix Préfixe utilisé pour rédiger l'arborescence ("└── " ; "├──" ; "│").
+ * @returns {string[]} Liste des lignes de la représentation en arbre.
+ */
 function getProjectTree(directoryPath = root, currentDepth = 0, maxDepth = 1, prefix = "") {
     if (currentDepth > maxDepth) return [];
 
@@ -121,7 +147,15 @@ function getProjectTree(directoryPath = root, currentDepth = 0, maxDepth = 1, pr
     return lines;
 }
 
-// Obtenir les variables d'environnement du fichier .env ou .env.example
+/**
+ * Extrait les variables d'environnement du fichier .env.
+ * 
+ * Ignore les lignes vides et les commentaires.
+ * Ne retourne que les noms de variables, sans leur valeur.
+ * 
+ * @param {string} envContent Contenu du fichier .env.
+ * @returns {string[]} Liste des noms des variables d'environnement.
+ */
 function getEnvVariables(envContent) {
     if (!envContent) return [];
 
@@ -132,7 +166,12 @@ function getEnvVariables(envContent) {
         .filter(Boolean);
 }
 
-// Filtrer les variables d'environnement importantes à partir de leur préfixe
+/**
+ * Filtre les variables d'environnement considérées comme importantes.
+ * 
+ * @param {string[]} envVariables Liste des noms des variables d'environnement.
+ * @returns {string[]} Liste des noms de variables d'environnement importantes.
+ */
 function getImportantEnvVariables(envVariables) {
     const prefixes = [
         'APP_',
@@ -151,7 +190,13 @@ function getImportantEnvVariables(envVariables) {
     );
 }
 
-// Obtenir les technologies de base de données à partir du contenu des fichiers .env et docker-compose
+/**
+ * Récupère les technologies de base de données détectées dans le projet.
+ * 
+ * @param {string} envContent Contenu du fichier .env.
+ * @param {string} dockerComposeContent Contenu du fichier Docker Compose.
+ * @returns {string[]} Liste des SGBD détectés.
+ */
 function getDatabaseTechnologies(envContent, dockerComposeContent) {
     const technologies = [];
 
@@ -165,7 +210,12 @@ function getDatabaseTechnologies(envContent, dockerComposeContent) {
     return [...new Set(technologies)];
 }
 
-// Obtenir un résumé des routes à partir du contenu des fichiers de routes
+/**
+ * Effectue un résumé des routes définies dans les fichiers de routes backend.
+ * 
+ * @param {string} routerContent Contenu d'un fichier de routes
+ * @returns {string[]} Liste résumée des routes trouvées.
+ */
 function getRouteSummary(routerContent) {
     if (!routerContent) return [];
 
@@ -185,20 +235,17 @@ function getRouteSummary(routerContent) {
     return summary;
 }
 
-// Lire les fichiers de configuration du projet
+// Lecture des fichiers de configuration du projet.
 const packageJson = readJsonFileIfExists(path.join(root, "package.json"));
 const composerJson = readJsonFileIfExists(path.join(root, "composer.json"));
-
-// Lire les fichiers d'environnement et de configuration Docker
 const envExample = readFileIfExists(path.join(root, ".env.example"));
 const dockerCompose = readFileIfExists(path.join(root, "docker-compose.yml"));
 const dockerComposeOverride = readFileIfExists(path.join(root, "docker-compose.override.yml"));
 
-// Analyser les variables d'environnement et identifier celles qui sont importantes
 const envVariables = getEnvVariables(envExample);
 const importantEnvVariables = getImportantEnvVariables(envVariables);
 
-// Construire le contexte du projet avec toutes les informations collectées
+// Construction du contexte de projet ensuite fourni au générateur de README (par LLM).
 const context = {
     project: {
         name:
@@ -272,10 +319,9 @@ const context = {
     }
 };
 
-// Créer le répertoire de sortie du fichier JSON si nécessaire
+// Création du dossier de sortie et du fichier de contexte JSON.
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-// Écrire le contenu de la constante contexte dans le fichier JSON de sortie
 fs.writeFileSync(outputPath, JSON.stringify(context, null, 2), "utf-8");
 
-// Afficher un message de réussite dans la console
+// Affichage du message de réussite dans la console.
 console.log(`Project context has been analyzed and saved to ${outputPath}`);

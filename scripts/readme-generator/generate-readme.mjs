@@ -1,36 +1,35 @@
-/**
- * Ce script génère ou met à jour le fichier README.md du projet.
- * 
- * Il utilise :
- * - les instructions définies dans prompt.md ;
- * - la structure définie dans README-template.md ;
- * - le contexte généré par analyze-project.mjs dans project-context.json ;
- * - le README existant, si disponible.
- */
-
-// Importer le module 'fs' pour la manipulation des fichiers
 import fs from 'fs';
-// Importer le module 'path' pour la manipulation des chemins de fichiers
 import path from 'path';
-// Importer le SDK de OpenAI
 import OpenAI from 'openai';
 
-// Définir le chemin racine du projet
+// Racine du projet
 const root = path.resolve(process.cwd());
 
-// Définir les chemins des différents fichiers nécessaires à la génération du README
+// Chemins des fichiers utilisés pour la génération du README.
 const generatorDirectory = path.join(root, "scripts/readme-generator");
 const promptPath = path.join(generatorDirectory, "prompt.md");
 const templatePath = path.join(generatorDirectory, "README-template.md");
 const contextPath = path.join(generatorDirectory, "project-context.json");
 const readmePath = path.join(root, "README.md");
 
-// Vérifier l'existence d'un fichier
+/**
+ * Vérifie si un fichier ou un répertoire existe.
+ * 
+ * @param {string} filePath Chemin du fichier à vérifier.
+ * @returns {boolean} true si le fichier existe, sinon false.
+ */
 function fileExists(filePath) {
     return fs.existsSync(filePath);
 }
 
-// Lire un fichier obligatoire à la génération du README
+/**
+ * Vérifie qu'un fichier obligatoire à la génération par LLM soit existant et le lit.
+ * 
+ * @param {string} filePath Chemin du fichier à vérifier.
+ * @param {string} fileName Nom du fichier à vérifier.
+ * @returns {string} Contenu du fichier au format UTF-8.
+ * @throws {Error} Si le fichier est inexistant ou introuvable au chemin indiqué.
+ */
 function readMandatoryFile(filePath, fileName) {
     if(!fileExists(filePath)) {
         throw new Error(
@@ -41,14 +40,24 @@ function readMandatoryFile(filePath, fileName) {
     return fs.readFileSync(filePath, "utf-8");
 }
 
-// Lire un fichier optionnel à la génération du README
+/**
+ * Lit un fichier optionnel à la génération par LLM.
+ * 
+ * @param {string} filePath Chemin du fichier à lire.
+ * @returns {string} Contenu du fichier au format UTF-8.
+ */
 function readOptionalFile(filePath) {
     if(!fileExists(filePath)) return "";
 
     return fs.readFileSync(filePath, "utf-8");
 }
 
-// Nettoyer le fichier markdown généré
+/**
+ * Nettoie le contenu Markdown retourné par le LLM.
+ * 
+ * @param {string} content Contenu Markdown retourné par le LLM.
+ * @returns {string} Contenu Markdown nettoyé.
+ */
 function cleanMarkdown(content) {
     const trimmedContent = content.trim();
 
@@ -59,7 +68,14 @@ function cleanMarkdown(content) {
     return match ? match[1].trim() : trimmedContent;
 }
 
-// Valider le contenu du fichier généré
+/**
+ * Vérifie que le contenu généré par le LLM respecte certaines contraintes.
+ * 
+ * Le contenu ne doit pas être vide, il doit commencer par un titre de 1e niveau et ne plus contenir de placeholders.
+ * 
+ * @param {string} content Contenu généré par LLM à vérifier.
+ * @throws {Error} Si le contenu est vide, ne commence pas par un titre ou qu'il contient un ou plusieurs placeholders.
+ */
 function validateReadme(content) {
     if (!content || content.trim().length === 0) throw new Error("Le LLM a retourné un README vide.");
 
@@ -68,7 +84,13 @@ function validateReadme(content) {
     if (/{{[^}]+}}/.test(content)) throw new Error("Le README généré contient encore des placeholders.");
 }
 
-// Générer le README par LLM
+/**
+ * Génère ou met à jour le contenu du README du projet par LLM.
+ * 
+ * La fonction extrait les instructions, le template du README, le contexte du projet et le README existant. Elle effectue la requête au LLM, valide le résultat puis l'écrit dans le README.md final.
+ *
+ * @throws {Error} Si la clé API de OpenAI est absente des variables d'environnement.
+ */
 async function generateReadme() {
     
     console.log("Extraction des instructions…");
@@ -100,6 +122,7 @@ async function generateReadme() {
         apiKey: process.env.OPENAI_API_KEY
     });
 
+    // Construction du message contenant le template, le contexte du projet et l'éventuel README existant.
     const input = `
         # Template README :
         <readme-template>
@@ -124,6 +147,7 @@ async function generateReadme() {
 
     console.log("Génération du README par LLM…")
 
+    // Envoie les instructions et le contexte au LLM.
     const response = await client.responses.create({
         model: process.env.OPENAI_MODEL ?? "gpt-5.2",
         instructions,
@@ -134,15 +158,24 @@ async function generateReadme() {
     const cleanedContent = cleanMarkdown(generatedContent);
     validateReadme(cleanedContent);
 
+    // Écrit le contenu validé dans le fichier README.md.
     fs.writeFileSync(
         readmePath,
         `${cleanedContent}\n`,
         "utf-8"
     );
 
-    console.log("README.md a été généré.");
+    // Affichage du message de réussite dans la console.
+    console.log(
+        `README.md ${existingReadme ? "mis à jour" : "généré"} avec succès.`
+    );
 }
 
+/**
+ * Lance la génération du README et intercepte les erreurs.
+ * 
+ * Si une erreur survient durant la génération, un message d'erreur est affiché dans la console et un code de sortie est indiqué. Le code 1 signale un échec à GitHub Actions.
+ */
 generateReadme().catch((error) => {
     console.error(`Une erreur est survenue : ${error.message}`);
     process.exit(1);
