@@ -11,26 +11,16 @@
 | Backend | {{BACKEND_TECHNOLOGIES}} |
 | Frontend | {{FRONTEND_TECHNOLOGIES}} |
 | Base de données | {{DATABASE_TECHNOLOGIES}} |
-| Infrastructure | {{INFRA_TECHNOLOGIES}} |
+| Infrastructure | {{INFRASTRUCTURE_TECHNOLOGIES}} |
 | Tests | {{TEST_TECHNOLOGIES}} | 
-
----
-
-## Architecture 
-
-L’organisation du projet est la suivante.
-
-```text
-{{PROJECT_STRUCTURE}}
-```
 
 ---
 
 ## Prérequis
 
-Les outils suivants sont nécessaires à l’exécution du projet.
+Les outils suivants sont nécessaires à l'installation et à l’exécution du projet.
 
-| Outils | Version |
+| Outil | Version |
 |--------|---------|
 {{PREREQUISITES_LIST}}
 
@@ -38,22 +28,26 @@ Les outils suivants sont nécessaires à l’exécution du projet.
 
 ## Installation
 
-### 1. Clonage du dépôt distant
+### Clonage du dépôt distant
 
 ```bash
 git clone {{REPOSITORY_URL}}
 cd {{PROJECT_DIRECTORY}}
 ```
 
-### 2. Configuration
+### Configuration
+
+{{CONFIGURATION_DESCRIPTION}}
 
 ```bash
 cp .env.example .env
 ```
 
-### 3. Dépendances
+### Installation des dépendances
 
 #### Backend
+
+{{BACKEND_INSTALL_DESCRIPTION}}
 
 ```bash
 {{BACKEND_INSTALL_COMMANDS}}
@@ -61,17 +55,23 @@ cp .env.example .env
 
 #### Frontend
 
+{{FRONTEND_INSTALL_DESCRIPTION}}
+
 ```bash
 {{FRONTEND_INSTALL_COMMANDS}}
 ```
 
-### 4. Initialisation
+### Initialisation
+
+{{PROJECT_INITIALIZATION_DESCRIPTION}}
 
 ```bash
 {{PROJECT_INITIALIZATION_COMMANDS}}
 ```
 
-### 5. Démarrage
+### Démarrage
+
+{{PROJECT_STARTING_DESCRIPTION}}
 
 ```bash
 {{PROJECT_STARTING_COMMANDS}}
@@ -81,7 +81,7 @@ cp .env.example .env
 
 ## Variables d’environnement requises
 
-Les variables d’environnement suivantes doivent être adaptées.
+Les variables d’environnement suivantes doivent être adaptées avant l'exécution du projet.
 
 | Variable | Description |
 |-----------|-------------|
@@ -93,19 +93,25 @@ Les variables d’environnement suivantes doivent être adaptées.
 
 {{DATABASE_DESCRIPTION}}
 
-### 1. Initialisation
+### Initialisation
+
+{{DATABASE_INITIALIZATION_DESCRIPTION}}
 
 ```bash
 {{DATABASE_INITIALIZATION_COMMANDS}}
 ```
 
-### 2. Migrations
+### Migrations
+
+{{DATABASE_MIGRATION_DESCRIPTION}}
 
 ```bash
 {{DATABASE_MIGRATION_COMMANDS}}
 ```
 
-### 3. Seeders
+### Seeders
+
+{{DATABASE_SEED_DESCRIPTION}}
 
 ```bash
 {{DATABASE_SEED_COMMANDS}}
@@ -115,13 +121,17 @@ Les variables d’environnement suivantes doivent être adaptées.
 
 ## Tests
 
-### 1. Configuration
+### Configuration
+
+{{TEST_SETUP_DESCRIPTION}}
 
 ```bash
 {{TEST_SETUP_COMMANDS}}
 ```
 
-### 2. Exécution
+### Exécution
+
+{{TEST_EXECUTION_DESCRIPTION}}
 
 ```bash
 {{TEST_COMMANDS}}
@@ -137,6 +147,6 @@ Les variables d’environnement suivantes doivent être adaptées.
 
 ---
 
-## Documentation complèmentaire
+## Documentation complémentaire
 
 <!-- La documentation supplémentaire du projet doit être indiquée manuellement. -->

@@ -8,131 +8,56 @@
 
 | Domaine | Technologies |
 |---------|--------------|
-| Backend | N/A |
-| Frontend | Node.js (npm), Vite |
-| Base de données | N/A |
-| Infrastructure | GitHub Actions (workflows) |
-| Tests | N/A | 
-
----
-
-## Architecture 
-
-L’organisation du projet est la suivante.
-
-```text
-├── .github/
-│   └── workflows/
-├── scripts/
-│   └── readme-generator/
-├── .env.example
-├── .gitignore
-├── package-lock.json
-└── package.json
-```
+| Frontend | Vite |
+| Infrastructure | Node.js |
+| Tests | openai |
 
 ---
 
 ## Prérequis
 
-Les outils suivants sont nécessaires à l’exécution du projet.
+Les outils suivants sont nécessaires à l'installation et à l’exécution du projet.
 
-| Outils | Version |
+| Outil | Version |
 |--------|---------|
-| Node.js |  |
-| npm |  |
+| Node.js | – |
+| npm | – |
 
 ---
 
 ## Installation
 
-### 1. Clonage du dépôt distant
+### Clonage du dépôt distant
 
 ```bash
-git clone https://github.com/floriansalvi/TB_Boilerplate
+git clone https://github.com/floriansalvi/TB_Boilerplate.git
 cd boilerplate
 ```
 
-### 2. Configuration
+### Configuration
+
+Copier le fichier d’exemple des variables d’environnement afin de créer votre fichier local.
 
 ```bash
 cp .env.example .env
 ```
 
-### 3. Dépendances
-
-#### Backend
-
-```bash
-# N/A
-```
+### Installation des dépendances
 
 #### Frontend
+
+Installer les dépendances Node.js.
 
 ```bash
 npm install
 ```
 
-### 4. Initialisation
+### Démarrage
 
-```bash
-npm run docs:readme
-```
-
-### 5. Démarrage
+Démarrer le serveur de développement Vite.
 
 ```bash
 npm run dev
-```
-
----
-
-## Variables d’environnement requises
-
-Les variables d’environnement suivantes doivent être adaptées.
-
-| Variable | Description |
-|-----------|-------------|
-<!-- Aucune variable importante n’a été identifiée automatiquement dans le contexte. -->
-
----
-
-## Base de données
-
-Aucune base de données n’est configurée d’après le contexte du projet.
-
-### 1. Initialisation
-
-```bash
-# N/A
-```
-
-### 2. Migrations
-
-```bash
-# N/A
-```
-
-### 3. Seeders
-
-```bash
-# N/A
-```
-
----
-
-## Tests
-
-### 1. Configuration
-
-```bash
-# N/A
-```
-
-### 2. Exécution
-
-```bash
-# N/A
 ```
 
 ---
@@ -141,14 +66,10 @@ Aucune base de données n’est configurée d’après le contexte du projet.
 
 | Commande | Description |
 |----------|-------------|
-| `npm run dev` | Démarre le serveur de développement Vite. |
-| `npm run build` | Génère le build de production. |
-| `npm run analyze` | Analyse le projet (script interne de génération de README). |
-| `npm run generate:readme` | Génère le README à partir de l’analyse (utilise le fichier `.env`). |
-| `npm run docs:readme` | Exécute l’analyse puis la génération du README. |
+| `npm run build` | Générer la version de production (build Vite). |
 
 ---
 
-## Documentation complèmentaire
+## Documentation complémentaire
 
 <!-- La documentation supplémentaire du projet doit être indiquée manuellement. -->
