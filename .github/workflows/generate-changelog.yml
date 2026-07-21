@@ -1,0 +1,66 @@
+name: Generate CHANGELOG
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+
+jobs:
+  generate-changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate commits list
+        env: 
+          CURRENT_TAG: ${{ github.event.release.tag_name }}
+        run: node scripts/changelog-generator/generate-commits-list.mjs
+
+      - name: Generate CHANGELOG
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+        run: node scripts/changelog-generator/generate-changelog.mjs
+
+      - name: Check changes
+        id: changes
+        run: |
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure Git
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit CHANGELOG
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git add CHANGELOG.md
+          git commit -m "docs(changelog): update/generate release ${{ github.event.release.target_commitish }}"
+          
+      - name: Push CHANGELOG
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git push origin HEAD:${{ github.event.release.target_commitish }}

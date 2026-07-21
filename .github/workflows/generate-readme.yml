@@ -69,7 +69,7 @@ jobs:
           node-version: 20
           cache: npm
       
-      # Installe les dépendances du projet mentionnées dans les fichiers de configuration.
+      # Installe les dépendances du projet
       - name: Install dependencies
         if: steps.files_changes.outputs.changed == 'true'
         run: npm ci
@@ -114,7 +114,7 @@ jobs:
         if: steps.readme_changes.outputs.changed == 'true'
         run: |
           git add README.md
-          git commit -m "fix(docs): update/generate README"
+          git commit -m "docs(readme): update/generate README"
 
       # Push le commit sur la branche concernée par la Pull Request.
       - name: Push README

@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
 
-// Racine du projet
+// Racine du projet.
 const root = path.resolve(process.cwd());
 
 // Chemin de sortie du fichier de contexte généré.
