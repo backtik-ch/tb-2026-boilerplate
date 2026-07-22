@@ -9,6 +9,7 @@ const root = path.resolve(process.cwd());
 const generatorDirectory = path.join(root, "scripts/changelog-generator");
 const promptPath = path.join(generatorDirectory, "prompt.md");
 const commitsListPath = path.join(generatorDirectory, "commits-list.json");
+const releaseNotesPath = path.join(generatorDirectory, `release-notes.md`);
 const releaseTemplatePath = path.join(generatorDirectory, "RELEASE-template.md")
 const changelogTemplatePath = path.join(generatorDirectory, "CHANGELOG-template.md");
 const existingChangelogPath = path.join(root, "CHANGELOG.md");
@@ -186,6 +187,13 @@ async function generateRelease() {
     const generatedContent = response.output_text;
     const cleanedContent = cleanMarkdown(generatedContent);
     validateRelease(cleanedContent, commitsList.version);
+
+    // Écrit le contenu de la release dans un fichier séparé pour la Release Note
+    fs.writeFileSync(
+        releaseNotesPath,
+        cleanedContent,
+        "utf-8"
+    );
 
     // Rédaction du CHANGELOG.md
     let finalChangelog;

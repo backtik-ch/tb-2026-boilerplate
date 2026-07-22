@@ -39,6 +39,14 @@ jobs:
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
         run: node scripts/changelog-generator/generate-changelog.mjs
 
+      - name: Update Git Release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CURRENT_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release edit "$CURRENT_TAG" \
+            --notes-file scripts/changelog-generator/release-notes.md
+
       - name: Check changes
         id: changes
         run: |
