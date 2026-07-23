@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "analyze": "node scripts/readme-generator/analyze-project.mjs",
-    "generate:readme": "node --env-file=.env scripts/readme-generator/generate-readme.mjs",
-    "docs:readme": "npm run analyze && npm run generate:readme"
+    "readme:analyze": "node scripts/readme-generator/analyze-project.mjs",
+    "readme:generate": "node --env-file=.env scripts/readme-generator/generate-readme.mjs",
+    "docs:readme": "npm run readme:analyze && npm run readme:generate"
   },
   "repository": {
     "type": "git",
