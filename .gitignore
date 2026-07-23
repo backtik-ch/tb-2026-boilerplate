@@ -4,5 +4,5 @@
 /vendor
 .env
 /.vscode
-.claude/
+# .claude/
 .github/skills
