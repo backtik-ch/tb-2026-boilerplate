@@ -4,15 +4,50 @@ on:
   pull_request:
     branches:
       - main
-      - prepod
+      - preprod
 
   workflow_call:
 
-permissions:
-  contents: read
-
 jobs:
   playwright:
-    name: Playwright E2E tests
     runs-on: ubuntu-latest
-    
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+
+      - name: Setup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Prepare environnement variables
+          run: cp .env.example .env
+
+      - name: Start database
+        run: |
+          docker compose up -d --wait db
+          php artisan key:generate
+
+      - name: Prepare database
+        run: |
+          php artisan migrate --force
+          php artisan db:seed --force
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: npx playwright test
