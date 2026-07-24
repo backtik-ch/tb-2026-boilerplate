@@ -1,0 +1,18 @@
+name: Playwright tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - prepod
+
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  playwright:
+    name: Playwright E2E tests
+    runs-on: ubuntu-latest
+    
