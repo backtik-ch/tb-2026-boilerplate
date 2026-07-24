@@ -34,7 +34,7 @@ jobs:
         run: npm ci
 
       - name: Prepare environnement variables
-          run: cp .env.example .env
+        run: cp .env.example .env
 
       - name: Start database
         run: |
