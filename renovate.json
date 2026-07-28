@@ -4,9 +4,6 @@
     
     "timezone": "Europe/Zurich",
     
-    "schedule": ["before 7am on monday"],
-    "minimumReleaseAge": "7 days",
-    
     "automerge": false,
     
     "dependencyDashboard": true,
@@ -39,3 +36,4 @@
         }
     ]
 }
+
