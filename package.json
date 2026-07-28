@@ -23,9 +23,9 @@
   },
   "homepage": "https://github.com/floriansalvi/TB_Boilerplate#readme",
   "dependencies": {
-    "openai": "^6.46.0"
+    "openai": "^6.49.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.1"
+    "@playwright/test": "^1.62.0"
   }
 }
