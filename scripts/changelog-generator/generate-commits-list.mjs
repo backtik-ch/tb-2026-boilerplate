@@ -9,6 +9,7 @@ const root = path.resolve(process.cwd());
 const outputPath = path.join(root, "scripts/changelog-generator/commits-list.json");
 
 // Le tag actuel fourni par le workflow
+// CURRENT_TAG est défini dans le workflow 'generate-changelog.md'.
 const currentTag = process.env.CURRENT_TAG;
 if (!currentTag) throw new Error("La variable d'environnement CURRENT_TAG n'a pas été trouvée.")
 
@@ -36,8 +37,9 @@ const versionsRange = previousTag
 // %x09 = tabulation
 // %s = message du commit
 // %an = auteur du commit
+// %ai = date du commit au format ISO
 const rawCommits = execSync(
-    `git log ${versionsRange} --pretty=format:${"%h" + "%x09" + "%s" + "%x09" + "%an"}`,
+    `git log ${versionsRange} --pretty=format:${"%h" + "%x09" + "%s" + "%x09" + "%an" + "%x09" + "%ai"}`,
     {
         encoding: "utf-8"
     }
@@ -51,11 +53,13 @@ const cleanedCommits = rawCommits
         const hash = elements[0];
         const message = elements[1];
         const author = elements[2];
+        const date = elements[3]
 
         return {
             hash,
             message,
-            author
+            author,
+            date
         };
     });
 
