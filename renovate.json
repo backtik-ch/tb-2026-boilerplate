@@ -1,0 +1,41 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:recommended"],
+    
+    "timezone": "Europe/Zurich",
+    
+    "schedule": ["before 7am on monday"],
+    "minimumReleaseAge": "7 days",
+    
+    "automerge": false,
+    
+    "dependencyDashboard": true,
+    
+    "prHourlyLimit": 0,
+    "prConcurrentLimit": 5,
+    
+    "labels": ["dependencies", "renovate"],
+    
+    "commitMessagePrefix": "chore(deps):",
+    
+    "rangeStrategy": "bump",
+    
+    "rebaseWhen": "behind-base-branch",
+    
+    "packageRules": [
+        {
+            "matchUpdateTypes": ["patch"],
+            "groupName": "patch updates",
+            "labels": ["dependencies", "renovate", "safe-update"]
+        },
+        {
+            "matchUpdateTypes": ["minor"],
+            "groupName": "minor updates",
+            "labels": ["dependencies", "renovate", "safe-update"]
+        },
+        {
+            "matchUpdateTypes": ["major"],
+            "labels": ["dependencies", "renovate", "major-update"]
+        }
+    ]
+}
