@@ -1,0 +1,77 @@
+name: Validate Renovate
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    if: startsWith(github.head_ref, 'renovate/')
+    uses: ./.github/workflows/tests.yml
+    secrets: inherit
+
+  playwright-tests:
+    if: startsWith(github.head_ref, 'renovate/')
+    uses: ./.github/workflows/playwright-tests.yml
+    secrets: inherit
+
+  check-results:
+    if: always() && startsWith(github.head_ref, 'renovate/')
+    needs:
+      - tests
+      - playwright-tests
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Close Pull Request (test failed)
+        if: needs.tests.result != 'success' || needs.playwright-tests.result != 'success'
+        env: 
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr close "$PR_NUMBER" \
+            --repo "${{ github.repository }}" \
+            --comment "Une suite de tests ou plus a échoué…" \
+            --delete-branch
+      
+      - name: Notify backtik
+        if: needs.tests.result == 'success' && needs.playwright-tests.result == 'success'
+        env:
+          API_URL: https://notifications.backtik.ch/api/notifications/renovate
+          REPOSITORY: ${{ github.repository }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          curl \
+          --fail \
+          --silent \
+          --show-error \
+          --request POST \
+          --header "Content-Type: application/json" \
+          --data "$(jq -n \
+            --arg repository "$REPOSITORY" \
+            --arg pull_request "$PR_TITLE" \
+            --arg pull_request_url "$PR_URL" \
+            '{
+              repository: $repository,
+              updates: [{
+                pull_request: $pull_request,
+                status: "ready",
+                pull_request_url: $pull_request_url
+              }]
+            }'
+          )" \
+          "$API_URL"

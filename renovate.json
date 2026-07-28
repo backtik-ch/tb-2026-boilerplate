@@ -1,13 +1,16 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": ["config:recommended"],
+
+    "enabled": true,
     
     "timezone": "Europe/Zurich",
     
     "automerge": false,
     
     "dependencyDashboard": true,
-    
+    "dependencyDashboardApproval": false,
+
     "prHourlyLimit": 0,
     "prConcurrentLimit": 5,
     
@@ -23,12 +26,12 @@
         {
             "matchUpdateTypes": ["patch"],
             "groupName": "patch updates",
-            "labels": ["dependencies", "renovate", "safe-update"]
+            "labels": ["dependencies", "renovate", "patch-update"]
         },
         {
             "matchUpdateTypes": ["minor"],
             "groupName": "minor updates",
-            "labels": ["dependencies", "renovate", "safe-update"]
+            "labels": ["dependencies", "renovate", "minor-update"]
         },
         {
             "matchUpdateTypes": ["major"],
@@ -36,4 +39,3 @@
         }
     ]
 }
-
