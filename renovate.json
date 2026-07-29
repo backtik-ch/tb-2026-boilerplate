@@ -11,6 +11,9 @@
     "dependencyDashboard": true,
     "dependencyDashboardApproval": false,
 
+    "schedule": ["before 7am on monday"],
+    "minimumReleaseAge": "7 days",
+
     "prHourlyLimit": 0,
     "prConcurrentLimit": 5,
     
@@ -25,12 +28,10 @@
     "packageRules": [
         {
             "matchUpdateTypes": ["patch"],
-            "groupName": "patch updates",
             "labels": ["dependencies", "renovate", "patch-update"]
         },
         {
             "matchUpdateTypes": ["minor"],
-            "groupName": "minor updates",
             "labels": ["dependencies", "renovate", "minor-update"]
         },
         {

@@ -13,9 +13,9 @@ permissions:
   contents: read
 
 jobs:
-  tests:
+  vitest-tests:
     if: startsWith(github.head_ref, 'renovate/')
-    uses: ./.github/workflows/tests.yml
+    uses: ./.github/workflows/vitest-tests.yml
     secrets: inherit
 
   playwright-tests:
@@ -26,7 +26,7 @@ jobs:
   check-results:
     if: always() && startsWith(github.head_ref, 'renovate/')
     needs:
-      - tests
+      - vitest-tests
       - playwright-tests
 
     runs-on: ubuntu-latest
@@ -37,7 +37,7 @@ jobs:
 
     steps:
       - name: Close Pull Request (test failed)
-        if: needs.tests.result != 'success' || needs.playwright-tests.result != 'success'
+        if: needs.vitest-tests.result != 'success' || needs.playwright-tests.result != 'success'
         env: 
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
