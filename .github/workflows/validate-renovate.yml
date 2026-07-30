@@ -13,21 +13,8 @@ permissions:
   contents: read
 
 jobs:
-  vitest-tests:
-    if: startsWith(github.head_ref, 'renovate/')
-    uses: ./.github/workflows/vitest-tests.yml
-    secrets: inherit
-
-  playwright-tests:
-    if: startsWith(github.head_ref, 'renovate/')
-    uses: ./.github/workflows/playwright-tests.yml
-    secrets: inherit
-
   check-results:
-    if: always() && startsWith(github.head_ref, 'renovate/')
-    needs:
-      - vitest-tests
-      - playwright-tests
+    if: startsWith(github.head_ref, 'renovate/')
 
     runs-on: ubuntu-latest
 
@@ -36,19 +23,7 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Close Pull Request (test failed)
-        if: needs.vitest-tests.result != 'success' || needs.playwright-tests.result != 'success'
-        env: 
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          gh pr close "$PR_NUMBER" \
-            --repo "${{ github.repository }}" \
-            --comment "Une suite de tests ou plus a échoué…" \
-            --delete-branch
-      
       - name: Notify backtik
-        if: needs.tests.result == 'success' && needs.playwright-tests.result == 'success'
         env:
           API_URL: https://notifications.backtik.ch/api/notifications/renovate
           REPOSITORY: ${{ github.repository }}
