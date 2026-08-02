@@ -1,60 +1,46 @@
 name: Validate Renovate
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_run:
+    workflows:
+      - Tests
     types:
-      - opened
-      - synchronize
-      - reopened
+      - completed
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
-  vitest-tests:
-    if: startsWith(github.head_ref, 'renovate/')
-    uses: ./.github/workflows/vitest-tests.yml
-    secrets: inherit
-
-  playwright-tests:
-    if: startsWith(github.head_ref, 'renovate/')
-    uses: ./.github/workflows/playwright-tests.yml
-    secrets: inherit
-
-  check-results:
-    if: always() && startsWith(github.head_ref, 'renovate/')
-    needs:
-      - vitest-tests
-      - playwright-tests
-
+  check-tests:
+    if: github.event.workflow_run.event == 'pull_request' && startsWith(github.event.workflow_run.head_branch, 'renovate/')
+    
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-      pull-requests: write
-
     steps:
-      - name: Close Pull Request (test failed)
-        if: needs.vitest-tests.result != 'success' || needs.playwright-tests.result != 'success'
-        env: 
+      - name: Close PR (if tests failed)
+        if: github.event.workflow_run.conclusion != 'success'
+        env:
           GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
+          REPOSITORY: ${{ github.repository }}
         run: |
           gh pr close "$PR_NUMBER" \
-            --repo "${{ github.repository }}" \
+            --repo "$REPOSITORY" \
             --comment "Une suite de tests ou plus a échoué…" \
             --delete-branch
       
       - name: Notify backtik
-        if: needs.tests.result == 'success' && needs.playwright-tests.result == 'success'
+        if: github.event.workflow_run.conclusion == 'success'
         env:
+          GH_TOKEN: ${{ github.token }}
           API_URL: https://notifications.backtik.ch/api/notifications/renovate
           REPOSITORY: ${{ github.repository }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number }}
         run: |
+          PR_TITLE=$(gh pr view "$PR_NUMBER" --repo "$REPOSITORY" --json title -q .title)
+          PR_URL=$(gh pr view "$PR_NUMBER" --repo "$REPOSITORY" --json url -q .url)
+
           curl \
           --fail \
           --silent \

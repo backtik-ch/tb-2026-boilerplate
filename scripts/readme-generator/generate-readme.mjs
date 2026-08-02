@@ -52,21 +52,7 @@ function readOptionalFile(filePath) {
     return fs.readFileSync(filePath, "utf-8");
 }
 
-/**
- * Nettoie le contenu Markdown retourné par le LLM.
- * 
- * @param {string} content Contenu Markdown retourné par le LLM.
- * @returns {string} Contenu Markdown nettoyé.
- */
-function cleanMarkdown(content) {
-    const trimmedContent = content.trim();
-
-    const markdownBlockPattern = /^```(?:markdown|md)?\s*\n([\s\S]*?)\n```$/i;
-
-    const match = trimmedContent.match(markdownBlockPattern);
-
-    return match ? match[1].trim() : trimmedContent;
-}
+a
 
 /**
  * Vérifie que le contenu généré par le LLM respecte certaines contraintes.
@@ -145,7 +131,7 @@ async function generateReadme() {
         Génère maintenant le README final en suivant les instructions.
     `;
 
-    console.log("Génération du README par LLM…")
+    console.log("Génération du README par LLM…");
 
     // Envoie les instructions et le contexte au LLM.
     const response = await client.responses.create({

@@ -1,0 +1,19 @@
+name: Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - preprod
+
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  vitest-tests:
+    uses: ./.github/workflows/vitest-tests.yml
+    secrets: inherit
+
+  playwright-tests:
+    uses: ./.github/workflows/playwright-tests.yml
+    secrets: inherit

@@ -1,16 +1,11 @@
 name: Playwright tests
 
 on:
-  pull_request:
-    branches:
-      - main
-      - preprod
-
   workflow_call:
+  workflow_dispatch:
 
 jobs:
   playwright:
-    if: github.event_name == 'workflow_call' || !startsWith(github.head_ref, 'renovate')
     runs-on: ubuntu-latest
 
     steps:
