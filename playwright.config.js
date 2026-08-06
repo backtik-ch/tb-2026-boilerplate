@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// URL utilisée pour l'exécution des tests.
 const baseURL =
     process.env.E2E_BASE_URL ??
     process.env.VITE_APP_URL ??
@@ -11,12 +12,14 @@ export default defineConfig({
     workers: 1,
     retries: 1,
 
+    // Configuration des rappors générés par Playwright.
     reporter: [
         ['list'],
         ['html', { outputFolder: './tests/e2e/reports', open: 'never' }],
     ],
     outputDir: './tests/e2e/test-results',
 
+    // Paramètres des tests.
     use: {
         baseURL,
         headless: true,
@@ -35,7 +38,7 @@ export default defineConfig({
         // Gère les états de session pour les différents rôles.
         { name: 'setup', testMatch: /auth\.setup\.js/, dependencies: ['db-reset'] },
 
-        // Suite de tests
+        // Exécite la suite de tests sur Chromium.
         {
             name: 'chromium',
             use: { ...devices['Desktop Chrome'] },
@@ -44,6 +47,7 @@ export default defineConfig({
         },
     ],
 
+    // Démarre automatiquement le serveur lors de l'exécution des tests.
     webServer: {
         command: 'composer dev',
         url: baseURL,

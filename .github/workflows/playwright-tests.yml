@@ -9,41 +9,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Récupère le contenu du dépôt.
       - name: Checkout
         uses: actions/checkout@v7
 
+      # Installe PHP
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
 
+      # Configure Node.js et initie le cache.
       - name: Setup node.js
         uses: actions/setup-node@v7
         with:
           node-version: 24.18.0
           cache: npm
 
+      # Installe les dépendances composer.
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      # Installe les dépendances npm.
       - name: Install Node dependencies
         run: npm ci
 
+      # Copie les variables d'environnement dans le .env.
       - name: Prepare environnement variables
         run: cp .env.example .env
 
+      # Initie la base de données.
       - name: Start database
         run: |
           docker compose up -d --wait db
           php artisan key:generate
 
+      # Exécute les migrations et seeders sur la base de données.
       - name: Prepare database
         run: |
           php artisan migrate --force
           php artisan db:seed --force
-      
+
+      # Installe les navigateurs Playwright. 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
+      # Exécute la suite de tests générée.
       - name: Run Playwright tests
         run: npx playwright test

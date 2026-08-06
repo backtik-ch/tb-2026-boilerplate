@@ -36,7 +36,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Exécution manuelle : la génération du README est lancée."
+            echo "README generation started."
             exit 0
           fi
           git fetch origin "${{ github.base_ref }}"
@@ -55,10 +55,10 @@ jobs:
           )"
           if [ -n "$changed_files" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Un ou plusieurs fichiers surveillés ont été modifiés"
+            echo "One or more files have been modified."
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "Aucun fichier surveillé n'a été modifié."
+            echo "No files were modified."
           fi
 
       # Installe Node.js et initie le cache npm.
@@ -97,11 +97,11 @@ jobs:
         run: |
           if [ -n "$(git status --porcelain -- README.md)" ]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Le README a été créé ou modifié."
+            echo "README.md has been generated or updated."
             git status --short -- README.md
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "Aucune modification du README."
+            echo "No changes detected in README.md."
           fi
 
       # Configure l'utilisateur Git pour le commit automatique.

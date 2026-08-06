@@ -11,7 +11,7 @@ const outputPath = path.join(root, "scripts/changelog-generator/commits-list.jso
 // Le tag actuel fourni par le workflow
 // CURRENT_TAG est défini dans le workflow 'generate-changelog.md'.
 const currentTag = process.env.CURRENT_TAG;
-if (!currentTag) throw new Error("La variable d'environnement CURRENT_TAG n'a pas été trouvée.")
+if (!currentTag) throw new Error("The CURRENT_TAG environment variable is missing.")
 
 // Tous les tags du projet, triés du plus récent au plus ancien.
 const allTags = execSync(
@@ -22,7 +22,7 @@ const allTags = execSync(
 ).trim().split("\n");
 
 const currentIndex = allTags.indexOf(currentTag);
-if (currentIndex === -1) throw new Error(`Le tag ${currentTag} n'a pas été trouvé.`);
+if (currentIndex === -1) throw new Error(`Le tag ${currentTag} could not be found.`);
 
 // Le tag précédent
 const previousTag = allTags[currentIndex + 1];

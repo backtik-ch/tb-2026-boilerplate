@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Ferme la Pull Request si un ou plusieurs tests ont échoué.
       - name: Close PR (if tests failed)
         if: github.event.workflow_run.conclusion != 'success'
         env:
@@ -30,6 +31,7 @@ jobs:
             --comment "Une suite de tests ou plus a échoué…" \
             --delete-branch
       
+      # Notifie backtik si une dépendance peut être mise à jour.
       - name: Notify backtik
         if: github.event.workflow_run.conclusion == 'success'
         env:

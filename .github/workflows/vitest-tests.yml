@@ -9,17 +9,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Récupère le contenu du dépôt.
       - name: Checkout
         uses: actions/checkout@v7
 
+      # Configure Node.js et initie le cache.
       - name: Setup node.js
         uses: actions/setup-node@v7
         with:
           node-version: 24.18.0
           cache: npm
 
+      # Installe les dépendances npm.
       - name: Install Node dependencies
         run: npm ci
 
+      # Exécute les tests générés.
       - name: Run Vitest tests
         run: npx vitest run

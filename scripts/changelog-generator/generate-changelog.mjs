@@ -35,7 +35,7 @@ function fileExists(filePath) {
 function readMandatoryFile(filePath, fileName) {
     if(!fileExists(filePath)) {
         throw new Error(
-            `${fileName} est introuvable au chemin : ${filePath}`
+            `${fileName} could not be found at : ${filePath}`
         );
     }
 
@@ -71,7 +71,10 @@ function cleanMarkdown(content) {
 }
 
 /**
+ * Vérifie la structure et le contenu de la liste de commits.
  * 
+ * @param {string} content Contenu JSON de la liste de commits.
+ * @return @returns {{version: string, commits: Array}} Liste de commits validée.
  */
 function validateCommitsList(content) {
     let commitsList;
@@ -79,7 +82,7 @@ function validateCommitsList(content) {
     try {
         commitsList = JSON.parse(content);
     } catch {
-        throw new Error("La liste de commits est un fichier JSON invalide.");
+        throw new Error("The commits list contains is an invalid JSON file.");
     }
 
     if (typeof commitsList.version !== "string" || commitsList.version.trim().length === 0) throw new Error("La liste de commits ne contient pas une version valide.");
@@ -97,15 +100,15 @@ function validateCommitsList(content) {
  * @throws {Error} Si le contenu est vide ou qu'il contient un ou plusieurs placeholders.
  */
 function validateRelease (content, version) {
-    if (!content || content.trim().length === 0) throw new Error("Le LLM a retourné une release vide.");
+    if (!content || content.trim().length === 0) throw new Error("The LLM returned an empty release.");
 
-    if (/{{[^}]+}}/.test(content)) throw new Error("La release générée contient encore des placeholders.");
+    if (/{{[^}]+}}/.test(content)) throw new Error("The generated release still contains placeholders.");
 
     const expectedTitle = `## [${version}]`;
 
-    if (!content.trim().startsWith(expectedTitle)) throw new Error(`La release ne commence pas par ${expectedTitle}.`);
+    if (!content.trim().startsWith(expectedTitle)) throw new Error(`The generated release does not start with ${expectedTitle}.`);
 
-    if (content.includes("# Changelog")) throw new Error ("Le LLM a généré un changelog complet plutôt qu'une release.")
+    if (content.includes("# Changelog")) throw new Error ("The LLM generated a complete changelog instead of a single release.")
 }
 
 /**
@@ -117,27 +120,27 @@ function validateRelease (content, version) {
  */
 async function generateRelease() {
     
-    console.log("Extraction des instructions…");
+    console.log("Loading instructions...");
     const instructions = readMandatoryFile(
         promptPath,
         "Prompt"
     );
 
-    console.log("Extraction de la liste de commits…");
+    console.log("Loading commits list...");
     const commitsListContent = readMandatoryFile(
         commitsListPath,
         "Liste de commits"
     );
     const commitsList = validateCommitsList(commitsListContent);
 
-    console.log("Extraction du template de release…");
+    console.log("Loading release template...");
     const releaseTemplate = readMandatoryFile(
         releaseTemplatePath,
         "Template RELEASE"
     );
 
 
-    console.log("Extraction du CHANGELOG existant…");
+    console.log("Loading existing changelog...");
     const existingChangelog = readOptionalFile(
         existingChangelogPath
     );
@@ -145,16 +148,16 @@ async function generateRelease() {
     let changelogTemplate = "";
 
     if(!existingChangelog) {
-        console.log("Extraction du template de CHANGELOG");
+        console.log("Loading changelog template...");
         changelogTemplate = readMandatoryFile(
             changelogTemplatePath,
             "CHANGELOG TEMPLATE"
         );
     }
 
-    if (existingChangelog && existingChangelog.includes(`## [${commitsList.version}]`)) throw new Error("Cette version est déjà documentée dans le changelog.")
+    if (existingChangelog && existingChangelog.includes(`## [${commitsList.version}]`)) throw new Error(`Version ${commitsList.version} is already documented in the changelog.`)
 
-    if (!process.env.OPENAI_API_KEY) throw new Error("La clé OPENAI est absente des variables d'environnement.");
+    if (!process.env.OPENAI_API_KEY) throw new Error("The OPENAI_API_KEY environment variable is missing.");
 
     const client = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY
@@ -175,7 +178,7 @@ async function generateRelease() {
         Génère maintenant la nouvelle release en suivant les instructions.
     `;
 
-    console.log("Génération de la nouvelle release par LLM…")
+    console.log("Generating release with the LLM...")
 
     // Envoie les instructions et la liste de commits au LLM.
     const response = await client.responses.create({
@@ -200,7 +203,7 @@ async function generateRelease() {
 
     if(existingChangelog) {
         if(!existingChangelog.includes("<!-- RELEASES -->")) {
-            throw new Error("Le marqueur <!-- RELEASES --> n'a pas été trouvé dans le changelog.");
+            throw new Error("The <!-- RELEASES --> marker could not be found in the changelog.");
         }
 
         finalChangelog = existingChangelog.replace(
@@ -209,7 +212,7 @@ async function generateRelease() {
         );
     } else {
         if(!changelogTemplate.includes("{{RELEASES}}")) {
-            throw new Error("Le placeholder {{RELEASES}} n'a pas été trouvé dans le template.");
+            throw new Error("The {{RELEASES}} placeholder could not be found in the changelog template.");
         }
 
         finalChangelog = changelogTemplate.replace(
@@ -227,7 +230,7 @@ async function generateRelease() {
 
     // Affichage du message de réussite dans la console.
     console.log(
-        `CHANGELOG.md ${existingChangelog ? "mis à jour" : "généré"} avec succès.`
+        `CHANGELOG.md successfully ${existingChangelog ? "updated" : "generated"}.`
     );
 }
 
@@ -237,6 +240,6 @@ async function generateRelease() {
  * Si une erreur survient durant la génération, un message d'erreur est affiché dans la console et un code de sortie est indiqué. Le code 1 signale un échec à GitHub Actions.
  */
 generateRelease().catch((error) => {
-    console.error(`Une erreur est survenue : ${error.message}`);
+    console.error(`An error occurred: ${error.message}`);
     process.exit(1);
 })

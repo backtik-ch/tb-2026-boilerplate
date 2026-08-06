@@ -10,14 +10,17 @@ on:
   workflow_call:
 
 jobs:
+  # Génère les tests unitaires Vitest.
   generate-vitest:
     uses: ./.github/workflows/generate-vitest.yml
     secrets: inherit
 
+  # Exécute les tests unitaires Vitest.
   vitest-tests:
     uses: ./.github/workflows/vitest-tests.yml
     secrets: inherit
 
+  # Exécute les tests end-to-end Playwright.
   playwright-tests:
     uses: ./.github/workflows/playwright-tests.yml
     secrets: inherit

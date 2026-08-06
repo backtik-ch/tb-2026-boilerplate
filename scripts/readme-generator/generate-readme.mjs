@@ -33,7 +33,7 @@ function fileExists(filePath) {
 function readMandatoryFile(filePath, fileName) {
     if(!fileExists(filePath)) {
         throw new Error(
-            `${fileName} est introuvable au chemin : ${filePath}`
+            `${fileName} could not be found at : ${filePath}`
         );
     }
 
@@ -52,7 +52,21 @@ function readOptionalFile(filePath) {
     return fs.readFileSync(filePath, "utf-8");
 }
 
-a
+/**
+ * Nettoie le contenu Markdown retourné par le LLM.
+ * 
+ * @param {string} content Contenu Markdown retourné par le LLM.
+ * @returns {string} Contenu Markdown nettoyé.
+ */
+function cleanMarkdown(content) {
+    const trimmedContent = content.trim();
+
+    const markdownBlockPattern = /^```(?:markdown|md)?\s*\n([\s\S]*?)\n```$/i;
+
+    const match = trimmedContent.match(markdownBlockPattern);
+
+    return match ? match[1].trim() : trimmedContent;
+}
 
 /**
  * Vérifie que le contenu généré par le LLM respecte certaines contraintes.
@@ -63,11 +77,11 @@ a
  * @throws {Error} Si le contenu est vide, ne commence pas par un titre ou qu'il contient un ou plusieurs placeholders.
  */
 function validateReadme(content) {
-    if (!content || content.trim().length === 0) throw new Error("Le LLM a retourné un README vide.");
+    if (!content || content.trim().length === 0) throw new Error("The LLM returned an empty README.");
 
-    if (!content.trim().startsWith("# ")) throw new Error("Le README ne commence pas par un titre.");
+    if (!content.trim().startsWith("# ")) throw new Error("The generated README does not start with a level-one heading.");
 
-    if (/{{[^}]+}}/.test(content)) throw new Error("Le README généré contient encore des placeholders.");
+    if (/{{[^}]+}}/.test(content)) throw new Error("The generated README still contains placeholders.");
 }
 
 /**
@@ -79,30 +93,30 @@ function validateReadme(content) {
  */
 async function generateReadme() {
     
-    console.log("Extraction des instructions…");
+    console.log("Loading instructions...");
     const instructions = readMandatoryFile(
         promptPath,
         "Prompt"
     );
 
-    console.log("Extraction du template…");
+    console.log("Loading README template...");
     const template = readMandatoryFile(
         templatePath,
         "Template README"
     );
 
-    console.log("Extraction du contexte de projet…");
+    console.log("Loading project context...");
     const projectContext = readMandatoryFile(
         contextPath,
         "Contexte du projet"
     );
 
-    console.log("Extraction du README existant…");
+    console.log("Loading existing README...");
     const existingReadme = readOptionalFile(
         readmePath
     );
 
-    if (!process.env.OPENAI_API_KEY) throw new Error("La clé OPENAI est absente des variables d'environnement.");
+    if (!process.env.OPENAI_API_KEY) throw new Error("The OPENAI_API_KEY environment variable is missing.");
 
     const client = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY
@@ -131,7 +145,7 @@ async function generateReadme() {
         Génère maintenant le README final en suivant les instructions.
     `;
 
-    console.log("Génération du README par LLM…");
+    console.log("Generating README with the LLM...");
 
     // Envoie les instructions et le contexte au LLM.
     const response = await client.responses.create({
@@ -153,7 +167,7 @@ async function generateReadme() {
 
     // Affichage du message de réussite dans la console.
     console.log(
-        `README.md ${existingReadme ? "mis à jour" : "généré"} avec succès.`
+        `README.md sucessfully ${existingReadme ? "updated" : "generated"}.`
     );
 }
 
@@ -163,6 +177,6 @@ async function generateReadme() {
  * Si une erreur survient durant la génération, un message d'erreur est affiché dans la console et un code de sortie est indiqué. Le code 1 signale un échec à GitHub Actions.
  */
 generateReadme().catch((error) => {
-    console.error(`Une erreur est survenue : ${error.message}`);
+    console.error(`An error occurred: ${error.message}`);
     process.exit(1);
 })

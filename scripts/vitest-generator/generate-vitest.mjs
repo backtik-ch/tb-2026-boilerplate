@@ -31,7 +31,7 @@ function fileExists(filePath) {
 function readMandatoryFile(filePath, fileName) {
     if(!fileExists(filePath)) {
         throw new Error(
-            `${fileName} est introuvable au chemin : ${filePath}`
+            `${fileName} could not be found at: ${filePath}`
         );
     }
 
@@ -57,9 +57,11 @@ function cleanJSON(content) {
 }
 
 /**
- * Ecrit les fichiers de tests.
- * 
- * @param {Array} fichier généré par le LLM. 
+ * Écrit les fichiers de tests générés dans le projet.
+ * Les répertoires manquants sont automatiquement créés.
+ *
+ * @param {{path: string, content: string}[]} tests Fichiers de tests générés
+ * par le LLM.
  */
 function writeTestsFiles(tests) {
     for (const test of tests) {
@@ -68,28 +70,32 @@ function writeTestsFiles(tests) {
         fs.mkdirSync(path.dirname(testFilePath), { recursive: true });
         fs.writeFileSync(testFilePath, test.content, "utf-8");
 
-        console.log(`Test enregistré : ${testFilePath}`);
+        console.log(`Test file saved to: ${testFilePath}`);
     }
 }
 
 /**
- * Génère les tests unitaires Vitest par LLM.
+ * Génère les tests unitaires Vitest à l'aide d'un LLM.
+ * La fonction extrait les instructions et le contexte du projet, transmet ces éléments au LLM, puis écrit les fichiers de tests retournés.
+ *
+ * @throws {Error} Si un fichier obligatoire est absent, si la clé API OpenAI
+ * n'est pas définie ou si la réponse du LLM est invalide.
  */
 async function generateVitest() {
 
-    console.log("Extraction des instructions…");
+    console.log("Loading instructions...");
     const instructions = readMandatoryFile(
         promptPath,
         "Prompt"
     );
     
-    console.log("Extraction du contexte de projet…");
+    console.log("Loading project context...");
     const projectContext = readMandatoryFile(
         contextPath,
         "Contexte du projet"
     );
 
-    if (!process.env.OPENAI_API_KEY) throw new Error("La clé OPENAI est absente des variables d'environnement.");
+    if (!process.env.OPENAI_API_KEY) throw new Error("The OPENAI_API_KEY environment variable is missing.");
 
     const client = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY
@@ -105,7 +111,7 @@ async function generateVitest() {
         Génère maintenant les tests Vitest.
     `;
 
-    console.log("Génération des tests par LLM…");
+    console.log("Generating Vitest tests with the LLM...");
 
     // Envoie les instructions et le contexte au LLM.
     const response = await client.responses.create({
@@ -120,7 +126,7 @@ async function generateVitest() {
 
     // Affichage du message de réussite dans la console.
     console.log(
-        `${generatedContent.files.length} tests ont été générés avec succès.`
+        `${generatedContent.files.length} test file(s) successfully generated.`
     );
 }
 
@@ -130,6 +136,6 @@ async function generateVitest() {
  * Si une erreur survient durant la génération, un message d'erreur est affiché dans la console et un code de sortie est indiqué. Le code 1 signale un échec à GitHub Actions.
  */
 generateVitest().catch((error) => {
-    console.error(`Une erreur est survenue : ${error.message}`);
+    console.error(`An error occurred: ${error.message}`);
     process.exit(1);
 })

@@ -12,29 +12,35 @@ jobs:
       contents: write
 
     steps:
+      # Récupère le contenu du dépôt.
       - name: Checkout
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
+      # Configure Node.js et initie le cache.
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
           node-version: 24.18.0
           cache: npm
 
+      # Installe les dépendances.
       - name: Install dependencies
         run: npm ci
 
+      # Génère le contexte Vitest et l'enregistre.
       - name: Generate Vitest Context
         run: node scripts/vitest-generator/analyze-project.mjs
 
+      # Génère les suites de testes unitaires Vitest par LLM.
       - name: Generate Vitest Tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }} 
         run: node scripts/vitest-generator/generate-vitest.mjs
 
+      # Commit et push les tests générés, s'il y a eu des modifications de fichiers.
       - name: Commit generated tests
         uses: stefanzweifel/git-auto-commit-action@v6
         with:

@@ -45,6 +45,7 @@ cp .env.example .env
 | `OPENAI_MODEL`| Modèle OpenAI utilisé pour la génération automatique |
 | `E2E_BASE_URL`| URL utilisée par les tests Playwright |
 | `VITE_APP_URL`| URL de l'application |
+| `VITE_API_URL`| URL de l'API éventuelle |
 
 ---
 
