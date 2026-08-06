@@ -1,0 +1,41 @@
+name: Generate Vitest Tests
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  generate-vitest:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24.18.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Vitest Context
+        run: node scripts/vitest-generator/analyze-project.mjs
+
+      - name: Generate Vitest Tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }} 
+        run: node scripts/vitest-generator/generate-vitest.mjs
+
+      - name: Commit generated tests
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "test(unit): generate Vitest tests"

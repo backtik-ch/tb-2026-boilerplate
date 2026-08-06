@@ -85,7 +85,9 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
-        run: npm run docs:readme
+        run: |
+          node scripts/readme-generator/analyze-project.mjs
+          node scripts/readme-generator/generate-readme.mjs
 
       # Vérifie que le README ait été modifié ou créé pour éviter un commit inutile.
       - name: Check README changes

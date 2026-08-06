@@ -10,6 +10,10 @@ on:
   workflow_call:
 
 jobs:
+  generate-vitest:
+    uses: ./.github/workflows/generate-vitest.yml
+    secrets: inherit
+
   vitest-tests:
     uses: ./.github/workflows/vitest-tests.yml
     secrets: inherit

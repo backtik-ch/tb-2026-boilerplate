@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { execSync } from "child_process";
 
 // Racine du projet
 const root = path.resolve(process.cwd());
@@ -44,70 +45,59 @@ function readJsonFileIfExists(filePath) {
 }
 
 /**
- * Récupère les fichier frontend – .ts, .js, .vue.
- * Fonction récursive pour récupèrer les fichiers des sous-dossiers.
+ * Récupère les fichier frontend – .ts, .js, .vue modifiés par rapport à la branche main.
  * 
  * @param {*} directoryPath 
  * @returns {Array} Liste des fichiers avec le chemin + leur contenu.
  */
-function getFrontendFiles(directoryPath) {
+function getFrontendFiles() {
 
-    if(!fileExists(directoryPath)) {
-        return [];
-    }
+    const editedFiles = execSync('git diff --name-only origin/main...HEAD', { encoding: 'utf-8' }).trim().split('\n');
 
-    const ignoredFiles = [
-        "app.ts",
-        "app.js",
-        "bootstrap.ts",
-        "bootstrap.js",
-        "theme.ts",
-        "theme.js",
-        "ziggy.js",   
-    ];
+    const frontendFiles = [];
 
-    const includedDirectories = [
-        "Components",
-        "Composables",
-    ]
+    for (const file of editedFiles) {
 
-    const files = [];
+        if(
+            (
+                file.startsWith('resources/js/Components') || file.startsWith('resources/js/composables/')
+            ) &&
+            (
+                file.endsWith('.ts') || file.endsWith('.js') || file.endsWith('.vue')
+            )
+        ){
+            const filePath = path.join(root, file);
 
-    const items = fs.readdirSync(directoryPath, { withFileTypes: true });
+            if(fileExists(filePath)) {
+                const fileName = path.basename(file, path.extname(file));
 
-    for (const item of items) {
-        
-        const itemPath = path.join(directoryPath, item.name);
+                const testExtension = file.endsWith('.ts') || fs.readFileSync(filePath, "utf-8").includes('lang="ts"') ? '.test.ts' : '.test.js';
 
-        if (item.isDirectory()) {
-            
-            if(includedDirectories.includes(item.name)) {
-                files.push(...getFrontendFiles(itemPath));
-            } 
-        }
+                const testPath = path.join(root, 'tests/Unit/vitest', `${fileName}${testExtension}`);
 
-        if (!item.isDirectory() && ((item.name.endsWith(".ts") || item.name.endsWith(".js") || item.name.endsWith(".vue")))) {
-            
-            if(!ignoredFiles.includes(item.name)) {
-                files.push({
-                    path: path.relative(root, itemPath),
-                    code: fs.readFileSync(itemPath, "utf-8")
-                });
-            }
+                frontendFiles.push({
+                    path: file,
+                    content: fs.readFileSync(filePath, "utf-8"),
+                    test: fileExists(testPath) ? {
+                        path: path.relative(root, testPath),
+                        content: fs.readFileSync(testPath, "utf-8")
+                    } : null
+                })
+            }   
         }
     }
 
-    return files;
+    return frontendFiles;
 }
 
 const context = {
     packageJson: readJsonFileIfExists(path.join(root, "package.json")),
     
-    viteConfig: readFileIfExists(path.join(root, "vite.config.ts")),
+    viteConfig: readFileIfExists(path.join(root, "vite.config.ts")) || readFileIfExists(path.join(root, "vite.config.js")),
 
     typeScriptConfig: readJsonFileIfExists(path.join(root, "tsconfig.json")),
 
-    frontendFiles: getFrontendFiles(path.join(root, "resources/js"))
+    frontendFiles: getFrontendFiles()
 }
 
 // Création du dossier de sortie et du fichier de contexte JSON.
