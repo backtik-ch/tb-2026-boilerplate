@@ -3,7 +3,7 @@
     "extends": ["config:recommended"],
 
     "enabled": true,
-    
+
     "timezone": "Europe/Zurich",
     
     "automerge": false,
