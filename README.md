@@ -1,105 +1,134 @@
 # boilerplate
 
-<!-- La description du projet doit être rédigée manuellement. -->
-
----
-
-## Technologies
-
-| Domaine | Technologies |
-|---------|--------------|
-| Frontend | Vite |
-| Tests | Playwright |
-
----
-
-## Prérequis
-
-Les outils suivants sont nécessaires à l'installation et à l’exécution du projet.
-
-| Outil | Version |
-|--------|---------|
-| Node.js | – |
-| npm | – |
+Ce boilerplate fournit un ensemble d'outils d'automatisation de diverses tâches de développement :
+- Génération automatique du README.md
+- Génération automatique du CHANGELOG.md et des Release Notes
+- Suivi automatique des dépendances et de leurs versions
+- Génération automatique des suites de tests E2E Playwright
+- Génération automatique des suites de tests unitaires Vitest
 
 ---
 
 ## Installation
 
-### Clonage du dépôt distant
+### 1. Cloner le dépôt
+
+Créer un nouveau dépôt à partir du dépôt template ou cloner localement.
 
 ```bash
-git clone https://github.com/floriansalvi/TB_Boilerplate
-cd TB_Boilerplate
+git clone https://github.com/floriansalvi/TB_Boilerplate.git .
 ```
 
-### Configuration
+---
 
-Copier le fichier d'exemple et adapter les variables d'environnement nécessaires.
-
-```bash
-cp .env.example .env
-```
-
-### Installation des dépendances
-
-#### Frontend
-
-Installer les dépendances JavaScript du projet.
+### 2. Installer les dépendances
 
 ```bash
 npm install
 ```
 
-### Démarrage
+---
 
-Lancer le serveur de développement.
+### 3. Générer le fichier de variables d'environnement
 
 ```bash
-npm run dev
+cp .env.example .env
 ```
 
 ---
 
-## Variables d’environnement requises
-
-Les variables d’environnement suivantes doivent être adaptées avant l'exécution du projet.
+### 4. Compléter les variables d'environnement nécessaires
 
 | Variable | Description |
-|-----------|-------------|
-| APP_NAME | Nom de l’application. |
-| APP_TIMEZONE | Fuseau horaire de l’application. |
-| APP_URL | URL principale de l’application. |
-| APP_LOCALE | Langue par défaut de l’application. |
-| APP_FALLBACK_LOCALE | Langue de repli si la langue par défaut n’est pas disponible. |
-| VITE_APP_URL | URL de l’application exposée au frontend via Vite. |
-| VITE_API_URL | URL de l’API consommée par le frontend. |
+|----------|-------------|
+| `OPENAI_API_KEY` | Clé API de OpenAI |
+| `OPENAI_MODEL`| Modèle OpenAI utilisé pour la génération automatique |
+| `E2E_BASE_URL`| URL utilisée par les tests Playwright |
+| `VITE_APP_URL`| URL de l'application |
 
 ---
 
-## Tests
+### 5. Configuration du dépôt GitHub
 
-### Exécution
+#### Secrets
+- `OPENAI_API_KEY`
 
-Exécuter les tests end-to-end avec Playwright.
+#### Variables
+- `OPENAI_MODEL`
 
-```bash
-npx playwright test
+#### Permissions
+
+Dans :
+
+```
+Settings
+    └── Actions
+        └── General
 ```
 
+Activer :
+
+```
+Workflow permissions
+    └── Read and write permissions
+```
+
+#### Renvovate
+
+Installer l'application **Mend Renovate** sur le dépôt.
+
+[Installer Renovate](https://github.com/apps/renovate)
+
 ---
 
-## Commandes utiles
+### 6. (Option) Installer les dépendances séparemmment
 
-| Commande | Description |
-|----------|-------------|
-| `npm run build` | Génère le build de production. |
-| `npm run readme:analyze` | Analyse le projet pour extraire le contexte technique utilisé par le générateur de README. |
-| `npm run readme:generate` | Génère le README à partir du template et du contexte (nécessite un fichier `.env`). |
-| `npm run docs:readme` | Enchaîne l’analyse puis la génération du README. |
+#### OpenAI
 
----
+```bash
+npm install openai
+```
 
-## Documentation complémentaire
+#### Vitest
 
-<!-- La documentation supplémentaire du projet doit être indiquée manuellement. -->
+```bash
+npm install vitest
+```
+
+#### Vue Test Utils
+
+```bash
+npm install @vue/test-utils
+```
+
+#### jsdom
+
+```bash
+npm install jsdom
+```
+
+#### Playwright
+
+```bash
+npm install @playwright/test
+```
+
+#### Navigateur Chromium pour Playwright
+
+```bash
+npx playwright install chromium
+```
+
+## Guide d'utilisation
+
+[Télécharger le Guide d'utilisation](guide-utilisation_boilerplate.pdf)
+
+
+
+# Licence
+
+Copyright © 2026 backtik Sàrl
+
+Le code source du boilerplate est distribué sous licence MIT.
+
+Ce document a été réalisé par Florian Salvi pour backtik Sàrl dans le cadre de son Travail de Bachelor, effectué au terme de sa formation en Ingénierie des Médias à la Haute École d’Ingénierie et de Gestion du Canton de Vaud (HEIG-VD)
