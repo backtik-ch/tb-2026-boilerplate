@@ -119,13 +119,15 @@ npm install @playwright/test
 npx playwright install chromium
 ```
 
+---
+
 ## Guide d'utilisation
 
 [Télécharger le Guide d'utilisation](docs/guide-utilisation_boilerplate.pdf)
 
+---
 
-
-# Licence
+## Licence
 
 Copyright © 2026 backtik Sàrl
 
