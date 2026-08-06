@@ -121,7 +121,7 @@ npx playwright install chromium
 
 ## Guide d'utilisation
 
-[Télécharger le Guide d'utilisation](guide-utilisation_boilerplate.pdf)
+[Télécharger le Guide d'utilisation](docs/guide-utilisation_boilerplate.pdf)
 
 
 
