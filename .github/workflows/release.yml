@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+
+jobs:
+  generate-changelog:
+    uses: ./.github/workflows/release-generate-changelog.yml
+    with:
+      tag_name: ${{ github.event.release.tag_name }}
+      target_commitish: ${{ github.event.release.target_commitish }}
+      openai_model: ${{ vars.OPENAI_MODEL }}
+    secrets:
+      openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+
+  notify-release:
+    needs: generate-changelog
+    uses: ./.github/workflows/release-notify.yml
+    secrets:
+      webhook_secret: ${{ secrets.NOTIFICATIONS_GITHUB_RELEASES_WEBHOOK_SECRET }}
