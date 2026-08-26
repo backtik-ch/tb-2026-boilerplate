@@ -14,12 +14,12 @@ jobs:
     with:
       tag_name: ${{ github.event.release.tag_name }}
       target_commitish: ${{ github.event.release.target_commitish }}
-      openai_model: ${{ vars.OPENAI_MODEL }}
+      bp_openai_model: ${{ vars.BP_OPENAI_MODEL }}
     secrets:
-      openai_api_key: ${{ secrets.OPENAI_API_KEY }}
+      bp_openai_api_key: ${{ secrets.BP_OPENAI_API_KEY }}
 
   notify-release:
     needs: generate-changelog
     uses: ./.github/workflows/release-notify.yml
     secrets:
-      webhook_secret: ${{ secrets.NOTIFICATIONS_GITHUB_RELEASES_WEBHOOK_SECRET }}
+      bp_webhook_secret: ${{ secrets.BP_NOTIFICATIONS_GITHUB_RELEASES_WEBHOOK_SECRET }}

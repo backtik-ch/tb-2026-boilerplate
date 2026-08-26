@@ -83,8 +83,8 @@ jobs:
       - name: Analyze project and generate README
         if: steps.files_changes.outputs.changed == 'true'
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+          BP_OPENAI_API_KEY: ${{ secrets.BP_OPENAI_API_KEY }}
+          BP_OPENAI_MODEL: ${{ vars.BP_OPENAI_MODEL }}
         run: |
           node scripts/readme-generator/analyze-project.mjs
           node scripts/readme-generator/generate-readme.mjs

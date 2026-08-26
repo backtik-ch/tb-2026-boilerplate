@@ -2,8 +2,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 // URL utilisée pour l'exécution des tests.
 const baseURL =
-    process.env.E2E_BASE_URL ??
-    process.env.VITE_APP_URL ??
+    process.env.BP_E2E_BASE_URL ??
+    process.env.VITE_BP_APP_URL ??
     'http://localhost:5173';
 
 export default defineConfig({

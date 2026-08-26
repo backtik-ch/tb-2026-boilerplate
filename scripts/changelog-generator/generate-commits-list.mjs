@@ -9,9 +9,9 @@ const root = path.resolve(process.cwd());
 const outputPath = path.join(root, "scripts/changelog-generator/commits-list.json");
 
 // Le tag actuel fourni par le workflow
-// CURRENT_TAG est défini dans le workflow 'generate-changelog.md'.
-const currentTag = process.env.CURRENT_TAG;
-if (!currentTag) throw new Error("The CURRENT_TAG environment variable is missing.")
+// BP_CURRENT_TAG est défini dans le workflow 'release-generate-changelog.yml'.
+const currentTag = process.env.BP_CURRENT_TAG;
+if (!currentTag) throw new Error("The BP_CURRENT_TAG environment variable is missing.")
 
 // Tous les tags du projet, triés du plus récent au plus ancien.
 const allTags = execSync(

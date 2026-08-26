@@ -36,8 +36,8 @@ jobs:
       # Génère les suites de testes unitaires Vitest par LLM.
       - name: Generate Vitest Tests
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }} 
+          BP_OPENAI_API_KEY: ${{ secrets.BP_OPENAI_API_KEY }}
+          BP_OPENAI_MODEL: ${{ vars.BP_OPENAI_MODEL }}
         run: node scripts/vitest-generator/generate-vitest.mjs
 
       # Commit et push les tests générés, s'il y a eu des modifications de fichiers.

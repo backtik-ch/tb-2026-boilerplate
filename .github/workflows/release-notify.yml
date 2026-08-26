@@ -3,7 +3,7 @@ name: Release — Notify GitHub release
 on:
     workflow_call:
         secrets:
-            webhook_secret:
+            bp_webhook_secret:
                 description: Shared secret used to sign the GitHub webhook payload.
                 required: true
 
@@ -18,20 +18,20 @@ jobs:
             # Récupère la release après la mise à jour de ses notes par le workflow appelant.
             - name: Notify backtik
               env:
-                  API_URL: https://notifications.backtik.ch/api/notifications/github/releases
+                  BP_NOTIFY_API_URL: https://notifications.backtik.ch/api/notifications/github/releases
                   GH_TOKEN: ${{ github.token }}
-                  REPOSITORY: ${{ github.repository }}
-                  REPOSITORY_URL: ${{ github.event.repository.html_url }}
-                  RELEASE_ACTION: ${{ github.event.action }}
-                  TAG_NAME: ${{ github.event.release.tag_name }}
-                  WEBHOOK_SECRET: ${{ secrets.webhook_secret }}
+                  BP_REPOSITORY: ${{ github.repository }}
+                  BP_REPOSITORY_URL: ${{ github.event.repository.html_url }}
+                  BP_RELEASE_ACTION: ${{ github.event.action }}
+                  BP_TAG_NAME: ${{ github.event.release.tag_name }}
+                  BP_WEBHOOK_SECRET: ${{ secrets.bp_webhook_secret }}
               run: |
-                  release=$(gh api "repos/$REPOSITORY/releases/tags/$TAG_NAME")
+                  release=$(gh api "repos/$BP_REPOSITORY/releases/tags/$BP_TAG_NAME")
 
                   payload=$(jq -n \
-                    --arg action "$RELEASE_ACTION" \
-                    --arg repository "$REPOSITORY" \
-                    --arg repository_url "$REPOSITORY_URL" \
+                    --arg action "$BP_RELEASE_ACTION" \
+                    --arg repository "$BP_REPOSITORY" \
+                    --arg repository_url "$BP_REPOSITORY_URL" \
                     --argjson release "$release" \
                     '{
                       action: $action,
@@ -51,7 +51,7 @@ jobs:
                       }
                     }')
 
-                  signature="sha256=$(printf '%s' "$payload" | openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" -hex | sed 's/^.* //')"
+                  signature="sha256=$(printf '%s' "$payload" | openssl dgst -sha256 -hmac "$BP_WEBHOOK_SECRET" -hex | sed 's/^.* //')"
 
                   curl \
                     --fail \
@@ -62,4 +62,4 @@ jobs:
                     --header "X-GitHub-Event: release" \
                     --header "X-Hub-Signature-256: $signature" \
                     --data "$payload" \
-                    "$API_URL"
+                    "$BP_NOTIFY_API_URL"

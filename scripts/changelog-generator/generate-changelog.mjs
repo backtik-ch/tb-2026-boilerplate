@@ -157,10 +157,10 @@ async function generateRelease() {
 
     if (existingChangelog && existingChangelog.includes(`## [${commitsList.version}]`)) throw new Error(`Version ${commitsList.version} is already documented in the changelog.`)
 
-    if (!process.env.OPENAI_API_KEY) throw new Error("The OPENAI_API_KEY environment variable is missing.");
+    if (!process.env.BP_OPENAI_API_KEY) throw new Error("The BP_OPENAI_API_KEY environment variable is missing.");
 
     const client = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY
+        apiKey: process.env.BP_OPENAI_API_KEY
     });
 
     // Construction du message contenant le template et la liste de commits.
@@ -182,7 +182,7 @@ async function generateRelease() {
 
     // Envoie les instructions et la liste de commits au LLM.
     const response = await client.responses.create({
-        model: process.env.OPENAI_MODEL ?? "gpt-5.2",
+        model: process.env.BP_OPENAI_MODEL ?? "gpt-5.2",
         instructions,
         input
     });

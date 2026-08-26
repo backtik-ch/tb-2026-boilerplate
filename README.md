@@ -41,21 +41,23 @@ cp .env.example .env
 
 | Variable | Description |
 |----------|-------------|
-| `OPENAI_API_KEY` | Clé API de OpenAI |
-| `OPENAI_MODEL`| Modèle OpenAI utilisé pour la génération automatique |
-| `E2E_BASE_URL`| URL utilisée par les tests Playwright |
-| `VITE_APP_URL`| URL de l'application |
-| `VITE_API_URL`| URL de l'API éventuelle |
+| `BP_OPENAI_API_KEY` | Clé API de OpenAI réservée aux générateurs du boilerplate |
+| `BP_OPENAI_MODEL`| Modèle OpenAI utilisé par les générateurs du boilerplate |
+| `BP_E2E_BASE_URL`| URL utilisée par les tests Playwright du boilerplate |
+| `VITE_BP_APP_URL`| URL de l'application utilisée par le boilerplate |
+| `VITE_BP_API_URL`| URL de l'API éventuelle utilisée par le boilerplate |
+
+Le préfixe `BP` signifie *boilerplate*. Les variables `VITE_BP_*` conservent le préfixe requis par Vite.
 
 ---
 
 ### 5. Configuration du dépôt GitHub
 
 #### Secrets
-- `OPENAI_API_KEY`
+- `BP_OPENAI_API_KEY`
 
 #### Variables
-- `OPENAI_MODEL`
+- `BP_OPENAI_MODEL`
 
 #### Permissions
 

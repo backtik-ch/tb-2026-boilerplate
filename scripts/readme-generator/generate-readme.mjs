@@ -116,10 +116,10 @@ async function generateReadme() {
         readmePath
     );
 
-    if (!process.env.OPENAI_API_KEY) throw new Error("The OPENAI_API_KEY environment variable is missing.");
+    if (!process.env.BP_OPENAI_API_KEY) throw new Error("The BP_OPENAI_API_KEY environment variable is missing.");
 
     const client = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY
+        apiKey: process.env.BP_OPENAI_API_KEY
     });
 
     // Construction du message contenant le template, le contexte du projet et l'éventuel README existant.
@@ -149,7 +149,7 @@ async function generateReadme() {
 
     // Envoie les instructions et le contexte au LLM.
     const response = await client.responses.create({
-        model: process.env.OPENAI_MODEL ?? "gpt-5.2",
+        model: process.env.BP_OPENAI_MODEL ?? "gpt-5.2",
         instructions,
         input
     });

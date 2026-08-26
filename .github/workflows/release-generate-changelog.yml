@@ -11,12 +11,12 @@ on:
         description: Branch or commit targeted by the release.
         required: true
         type: string
-      openai_model:
+      bp_openai_model:
         description: Model used to generate the changelog.
         required: false
         type: string
     secrets:
-      openai_api_key:
+      bp_openai_api_key:
         description: API key used to generate the changelog.
         required: true
 
@@ -49,23 +49,23 @@ jobs:
       # Génère et enregistre la liste de commits.
       - name: Generate commits list
         env: 
-          CURRENT_TAG: ${{ inputs.tag_name }}
+          BP_CURRENT_TAG: ${{ inputs.tag_name }}
         run: node scripts/changelog-generator/generate-commits-list.mjs
 
       # Génère le contenu de la release et l'enregistre dans le CHANGELOG.md.
       - name: Generate Release content
         env:
-          OPENAI_API_KEY: ${{ secrets.openai_api_key }}
-          OPENAI_MODEL: ${{ inputs.openai_model }}
+          BP_OPENAI_API_KEY: ${{ secrets.bp_openai_api_key }}
+          BP_OPENAI_MODEL: ${{ inputs.bp_openai_model }}
         run: node scripts/changelog-generator/generate-changelog.mjs
 
       # Ajoute le contenu généré au notes de Release.
       - name: Update Git Release notes
         env:
           GH_TOKEN: ${{ github.token }}
-          CURRENT_TAG: ${{ inputs.tag_name }}
+          BP_CURRENT_TAG: ${{ inputs.tag_name }}
         run: |
-          gh release edit "$CURRENT_TAG" \
+          gh release edit "$BP_CURRENT_TAG" \
             --notes-file scripts/changelog-generator/release-notes.md
 
       # Vérifie si des changements ont eu lieu dand le CHANGELOG.md.
