@@ -1,0 +1,30 @@
+{
+  "extends": ["config:recommended"],
+  "enabled": true,
+  "timezone": "Europe/Zurich",
+  "automerge": false,
+  "dependencyDashboard": true,
+  "dependencyDashboardApproval": false,
+  "schedule": ["before 7am on monday"],
+  "minimumReleaseAge": "7 days",
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 5,
+  "labels": ["dependencies", "renovate"],
+  "commitMessagePrefix": "chore(deps):",
+  "rangeStrategy": "bump",
+  "rebaseWhen": "behind-base-branch",
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["patch"],
+      "labels": ["dependencies", "renovate", "patch-update"]
+    },
+    {
+      "matchUpdateTypes": ["minor"],
+      "labels": ["dependencies", "renovate", "minor-update"]
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "labels": ["dependencies", "renovate", "major-update"]
+    }
+  ]
+}

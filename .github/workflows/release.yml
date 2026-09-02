@@ -10,13 +10,15 @@ permissions:
 
 jobs:
   generate-changelog:
-    uses: ./.github/workflows/release-generate-changelog.yml
+    uses: backtik-ch/backtik-actions/.github/workflows/generate-changelog.yml@main
     with:
       tag_name: ${{ github.event.release.tag_name }}
       target_commitish: ${{ github.event.release.target_commitish }}
-      bp_openai_model: ${{ vars.BP_OPENAI_MODEL }}
+      default_branch: ${{ github.event.repository.default_branch }}
+      model: ${{ vars.BTK_CHANGELOG_MODEL }}
+      base_url: ${{ vars.BTK_CHANGELOG_BASE_URL }}
     secrets:
-      bp_openai_api_key: ${{ secrets.BP_OPENAI_API_KEY }}
+      api_key: ${{ secrets.BTK_CHANGELOG_API_KEY }}
 
   notify-release:
     needs: generate-changelog

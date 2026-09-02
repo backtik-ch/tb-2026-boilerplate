@@ -41,13 +41,16 @@ cp .env.example .env
 
 | Variable | Description |
 |----------|-------------|
-| `BP_OPENAI_API_KEY` | Clé API de OpenAI réservée aux générateurs du boilerplate |
-| `BP_OPENAI_MODEL`| Modèle OpenAI utilisé par les générateurs du boilerplate |
+| `BP_OPENAI_API_KEY` | Clé API OpenAI réservée aux générateurs README et Vitest du boilerplate |
+| `BP_OPENAI_MODEL`| Modèle OpenAI utilisé par les générateurs README et Vitest du boilerplate |
+| `BTK_CHANGELOG_API_KEY` | Clé API du fournisseur LLM réservée à la génération du changelog |
+| `BTK_CHANGELOG_MODEL` | Identifiant du modèle LLM utilisé pour le changelog |
+| `BTK_CHANGELOG_BASE_URL` | URL de base OpenAI-compatible ; laisser vide pour OpenAI |
 | `BP_E2E_BASE_URL`| URL utilisée par les tests Playwright du boilerplate |
 | `VITE_BP_APP_URL`| URL de l'application utilisée par le boilerplate |
 | `VITE_BP_API_URL`| URL de l'API éventuelle utilisée par le boilerplate |
 
-Le préfixe `BP` signifie *boilerplate*. Les variables `VITE_BP_*` conservent le préfixe requis par Vite.
+Le préfixe `BP` signifie *boilerplate* et reste réservé aux générateurs README et Vitest. Le préfixe `BTK_CHANGELOG` identifie sans ambiguïté la configuration du changelog. Les variables `VITE_BP_*` conservent le préfixe requis par Vite.
 
 ---
 
@@ -55,9 +58,14 @@ Le préfixe `BP` signifie *boilerplate*. Les variables `VITE_BP_*` conservent le
 
 #### Secrets
 - `BP_OPENAI_API_KEY`
+- `BTK_CHANGELOG_API_KEY`
 
 #### Variables
 - `BP_OPENAI_MODEL`
+- `BTK_CHANGELOG_MODEL`
+- `BTK_CHANGELOG_BASE_URL`
+
+Le générateur de changelog appelle une API compatible avec OpenAI Responses. Pour OpenAI, laisser `BTK_CHANGELOG_BASE_URL` vide. Pour DeepSeek, utiliser `https://api.deepseek.com` avec le modèle `deepseek-v4-flash`.
 
 #### Permissions
 
@@ -125,6 +133,10 @@ npx playwright install chromium
 ---
 
 ## Guide d'utilisation
+
+> La configuration du changelog documentée dans ce README est la source de vérité.
+> Le guide PDF historique doit être régénéré depuis son fichier source avant d'être
+> utilisé pour cette configuration.
 
 [Télécharger le Guide d'utilisation](docs/guide-utilisation_boilerplate.pdf)
 
