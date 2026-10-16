@@ -15,7 +15,7 @@ jobs:
   check-tests:
     if: github.event.workflow_run.event == 'pull_request' && startsWith(github.event.workflow_run.head_branch, 'renovate/')
     
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       # Ferme la Pull Request si un ou plusieurs tests ont échoué.
