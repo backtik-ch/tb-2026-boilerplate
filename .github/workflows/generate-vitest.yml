@@ -6,7 +6,7 @@ on:
 
 jobs:
   generate-vitest:
-    runs-on: ubuntu-24.04
+    runs-on: ${{ fromJSON(vars.RUNNER) }}
 
     permissions:
       contents: write
