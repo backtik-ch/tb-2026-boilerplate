@@ -24,9 +24,7 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 24.18.0
-          cache: npm
-
-      # Installe les dépendances composer.
+          package-manager-cache: false
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 

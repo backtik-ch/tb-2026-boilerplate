@@ -67,9 +67,7 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 24.18.0
-          cache: npm
-      
-      # Installe les dépendances du projet
+          package-manager-cache: false
       - name: Install dependencies
         if: steps.files_changes.outputs.changed == 'true'
         run: npm ci
